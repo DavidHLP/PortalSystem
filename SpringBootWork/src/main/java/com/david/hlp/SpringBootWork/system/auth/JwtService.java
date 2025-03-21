@@ -169,13 +169,13 @@ public class JwtService {
   }
 
   public void invalidateUserTokens(Long userId) {
-    List<Token> tokens = tokenMapper.findAllValidTokenByUser(userId);
+    List<Token> tokens = tokenMapper.listValidTokensByUser(userId);
     tokens.forEach(token ->
       {
         token.setRevoked(true);
         token.setExpired(true);
       }
     );
-    tokenMapper.updateAll(tokens);
+    tokenMapper.updateBatch(tokens);
   }
 }

@@ -1,7 +1,6 @@
 package com.david.hlp.SpringBootWork.system.aspect;
 
 import com.david.hlp.SpringBootWork.system.util.annotation.validatestring.ValidateString;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

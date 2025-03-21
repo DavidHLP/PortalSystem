@@ -16,18 +16,19 @@ public class UserServiceImp {
     private final UserMapper userMapper;
 
     public User getUserBaseInfo(Long userId) {
-        User user = userMapper.findByUserIdToUser(userId);
+        User user = userMapper.getByUserIdToUser(userId);
         User res = User.builder()
                 .id(user.getUserId())
                 .name(user.getUsername())
                 .email(user.getEmail())
+                .roleId(user.getRoleId())
                 .build();
         return res;
     }
 
     public PageInfo<User> getUserManageInfo(int pageNum, int pageSize, User query){
-        List<User> users = userMapper.findAllLimit(pageNum-1, pageSize, query);
-        Long total = userMapper.countAll(query); // 获取总记录数
+        List<User> users = userMapper.listByPage(pageNum-1, pageSize, query);
+        Long total = userMapper.count(query); // 获取总记录数
         PageInfo<User> pageInfo = PageInfo.<User>builder()
                 .items(users)
                 .query(query)
@@ -40,10 +41,10 @@ public class UserServiceImp {
     }
 
     public void deleteUser(DelUser user) {
-        userMapper.deleteUser(user.getId());
+        userMapper.deleteById(user.getId());
     }
 
     public void updateUser(User user) {
-        userMapper.updateUser(user);
+        userMapper.updateById(user);
     }
 }

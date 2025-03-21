@@ -17,19 +17,19 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 @Mapper
 public interface TokenMapper extends BaseMapper<Token> {
 
-    @Select("SELECT * FROM token WHERE token = #{token}")
-    Token findByToken(String token);
+    @Select("SELECT id, user_id, token, token_type, expired, revoked, created_at FROM token WHERE token = #{token}")
+    Token getByToken(String token);
 
     @Select("SELECT expired = FALSE AND revoked = FALSE FROM token WHERE token = #{token}")
-    Boolean isTokenValid(String token);
+    Boolean checkTokenValid(String token);
 
     @Insert("INSERT INTO token(user_id, token, token_type, expired, revoked) " +
             "VALUES(#{userId}, #{token}, #{tokenType}, #{expired}, #{revoked})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insert(Token token);
+    int save(Token token);
 
-    @Select("SELECT * FROM token WHERE user_id = #{userId} AND expired = false AND revoked = false")
-    List<Token> findAllValidTokenByUser(Long userId);
+    @Select("SELECT id, user_id, token, token_type, expired, revoked, created_at FROM token WHERE user_id = #{userId} AND expired = false AND revoked = false")
+    List<Token> listValidTokensByUser(Long userId);
 
     @Update({"<script>",
         "UPDATE token SET expired = #{expired}, revoked = #{revoked}",
@@ -38,5 +38,5 @@ public interface TokenMapper extends BaseMapper<Token> {
         "#{item.token}",
         "</foreach>",
         "</script>"})
-    void updateAll(@Param("list") List<Token> tokens);
+    void updateBatch(@Param("list") List<Token> tokens);
 }

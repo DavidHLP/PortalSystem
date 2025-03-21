@@ -1,6 +1,7 @@
 package com.david.hlp.SpringBootWork.system.entity.role;
 
 import lombok.Data;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.david.hlp.SpringBootWork.system.entity.permission.Permission;
@@ -9,7 +10,9 @@ import com.david.hlp.SpringBootWork.system.entity.router.Router;
  * 对应数据库中的 role 表
  */
 @Data
-public class Role {
+public class Role implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Long id;         // BIGINT 主键
     private Long userId;     // BIGINT 用户ID
     private String roleName; // 角色名称

@@ -10,31 +10,50 @@ import org.apache.ibatis.annotations.Insert;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Update;
 import com.david.hlp.SpringBootWork.system.entity.role.RolePermission;
+
+/**
+ * 角色数据访问层
+ */
 @Mapper
-public interface RoleMapper extends BaseMapper<Role>{
-    @Select("SELECT * FROM role WHERE id = #{roleId}")
-    Role findRoleByRoleId(Long roleId);
+public interface RoleMapper extends BaseMapper<Role> {
+    
+    /**
+     * 根据角色ID获取角色信息
+     * @param roleId 角色ID
+     * @return 角色信息
+     */
+    @Select("SELECT id, role_name, remark, status FROM role WHERE id = #{roleId}")
+    Role getRoleById(@Param("roleId") Long roleId);
 
+    /**
+     * 获取默认用户角色ID
+     * @return 默认用户角色ID
+     */
     @Select("SELECT id FROM role WHERE role_name = 'USER' LIMIT 1")
-    Long findDefaultRoleId();
+    Long getDefaultRoleId();
 
+    /**
+     * 根据条件查询所有角色
+     * @param roleName 角色名称
+     * @return 角色列表
+     */
     @Select(
     "<script> " +
-    "SELECT * FROM role " +
+    "SELECT id, role_name, remark, status FROM role " +
     "<where> " +
-        "<if test='roleName != null'> " +
-            "AND role_name LIKE '%${roleName}%' " +
+        "<if test='roleName != null and roleName != \"\"'> " +
+            "AND role_name LIKE CONCAT('%', #{roleName}, '%') " +
         "</if> " +
     "</where> " +
     "</script>")
-    List<Role> findAll(@Param("roleName") String roleName);
+    List<Role> listRoles(@Param("roleName") String roleName);
 
     /**
      * 删除角色的所有权限
      * @param roleId 角色ID
      */
     @Delete("DELETE FROM role_permission WHERE role_id = #{roleId}")
-    void deleteRolePermissions(Long roleId);
+    void deleteRolePermissions(@Param("roleId") Long roleId);
 
     /**
      * 删除角色的单个权限
@@ -47,7 +66,7 @@ public interface RoleMapper extends BaseMapper<Role>{
     /**
      * 批量插入角色权限关系
      * @param roleId 角色ID
-     * @param permissions 权限标识列表
+     * @param permissions 权限ID列表
      */
     @Insert("<script>INSERT INTO role_permission (role_id, permission_id) VALUES " +
            "<foreach collection='permissions' item='permission' separator=','>" +
@@ -56,18 +75,39 @@ public interface RoleMapper extends BaseMapper<Role>{
            "</script>")
     void insertRolePermissions(@Param("roleId") Long roleId, @Param("permissions") List<Long> permissions);
 
-    @Insert("INSERT INTO role (role_name, remark , status) VALUES (#{roleName}, #{remark}, #{status})")
+    /**
+     * 新增角色
+     * @param role 角色信息
+     */
+    @Insert("INSERT INTO role (role_name, remark, status) VALUES (#{roleName}, #{remark}, #{status})")
     void insertRole(Role role);
 
-    @Update("UPDATE role SET role_name = #{roleName}, remark = #{remark}  , status = #{status} WHERE id = #{id}")
+    /**
+     * 更新角色信息
+     * @param role 角色信息
+     */
+    @Update("UPDATE role SET role_name = #{roleName}, remark = #{remark}, status = #{status} WHERE id = #{id}")
     void updateRole(Role role);
 
-    @Select("SELECT * FROM role_permission WHERE role_id = #{roleId}")
-    List<RolePermission> findRolePermissions(Long roleId);
+    /**
+     * 获取角色的所有权限
+     * @param roleId 角色ID
+     * @return 角色权限列表
+     */
+    @Select("SELECT role_id, permission_id FROM role_permission WHERE role_id = #{roleId}")
+    List<RolePermission> listRolePermissions(@Param("roleId") Long roleId);
 
+    /**
+     * 根据角色ID删除角色
+     * @param roleId 角色ID
+     */
     @Delete("DELETE FROM role WHERE id = #{roleId}")
-    void deleteRoleByRoleId(Long roleId);
+    void deleteRole(@Param("roleId") Long roleId);
 
+    /**
+     * 根据角色ID删除角色权限关系
+     * @param roleId 角色ID
+     */
     @Delete("DELETE FROM role_permission WHERE role_id = #{roleId}")
-    void deleteRolePermissionByRoleId(Long roleId);
+    void deleteRolePermissionByRoleId(@Param("roleId") Long roleId);
 }

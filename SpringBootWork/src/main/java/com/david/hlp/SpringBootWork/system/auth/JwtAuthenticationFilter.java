@@ -87,7 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
       // 检查 JWT 是否在数据库中有效，且未过期或撤销
-      var isTokenValid = tokenMapper.isTokenValid(jwt);
+      var isTokenValid = tokenMapper.checkTokenValid(jwt);
 
       // 验证 JWT 是否有效
       if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {

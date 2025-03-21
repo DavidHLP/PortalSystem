@@ -23,7 +23,6 @@ import com.david.hlp.SpringBootWork.system.service.UserDetailsServiceImpl;
 public class ApplicationConfig {
 
   private final UserMapper userMapper;
-  private final RoleMapper roleMapper;
 
   /**
    * 配置 UserDetailsService，从数据库加载用户信息。
@@ -32,7 +31,7 @@ public class ApplicationConfig {
    */
   @Bean
   public UserDetailsService userDetailsService() {
-    return new UserDetailsServiceImpl(userMapper, roleMapper);
+    return new UserDetailsServiceImpl(userMapper);
   }
 
   /**

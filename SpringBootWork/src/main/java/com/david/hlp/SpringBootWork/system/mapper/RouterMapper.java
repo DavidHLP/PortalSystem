@@ -9,8 +9,10 @@ import java.util.List;
 @Mapper
 public interface RouterMapper extends BaseMapper<Router> {
 
-    @Select("SELECT * FROM router")
-    @Results(id = "BaseResultMap", value = {
+    @Select("SELECT id, pid, menu_order, status, remark, permission, path, name, icon, " +
+           "type, component, redirect, always_show, meta_title, meta_icon, meta_hidden, " +
+           "meta_roles, meta_keep_alive, hidden FROM router")
+    @Results(id = "routerResultMap", value = {
         @Result(property = "id", column = "id", id = true),
         @Result(property = "pid", column = "pid"),
         @Result(property = "menuOrder", column = "menu_order"),
@@ -29,13 +31,15 @@ public interface RouterMapper extends BaseMapper<Router> {
         @Result(property = "meta.metaHidden", column = "meta_hidden"),
         @Result(property = "meta.metaRoles", column = "meta_roles"),
         @Result(property = "meta.metaKeepAlive", column = "meta_keep_alive"),
-        @Result(property = "meta.hidden", column = "hidden"),
+        @Result(property = "meta.hidden", column = "hidden")
     })
-    List<Router> findAll();
+    List<Router> listAll();
 
-    @Select("SELECT * FROM router WHERE id = #{id}")
-    @ResultMap("BaseResultMap")
-    Router findById(Long id);
+    @Select("SELECT id, pid, menu_order, status, remark, permission, path, name, icon, " +
+           "type, component, redirect, always_show, meta_title, meta_icon, meta_hidden, " +
+           "meta_roles, meta_keep_alive, hidden FROM router WHERE id = #{id}")
+    @ResultMap("routerResultMap")
+    Router getById(Long id);
 
     @Update("<script>UPDATE router SET " +
             "<if test='pid != null'>pid = #{pid},</if> " +
@@ -60,7 +64,7 @@ public interface RouterMapper extends BaseMapper<Router> {
             "<if test='meta.metaKeepAlive != null'>meta_keep_alive = #{meta.metaKeepAlive},</if> " +
             "hidden = #{meta.hidden} " +
             "WHERE id = #{id}</script>")
-    void updateRouter(Router router);
+    void update(Router router);
 
     @Insert("<script>INSERT INTO router (" +
             "<if test='pid != null'>pid,</if> " +
@@ -99,9 +103,11 @@ public interface RouterMapper extends BaseMapper<Router> {
             "#{meta.hidden}" +
             ")</script>")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insertRouter(Router router);
+    void save(Router router);
 
-    @Select("<script>SELECT * FROM router " +
+    @Select("<script>SELECT id, pid, menu_order, status, remark, permission, path, name, icon, " +
+            "type, component, redirect, always_show, meta_title, meta_icon, meta_hidden, " +
+            "meta_roles, meta_keep_alive, hidden FROM router " +
             "<where>" +
             "router.id != 0" +
             "<if test='permissions != null and permissions.size() > 0'>" +
@@ -115,8 +121,8 @@ public interface RouterMapper extends BaseMapper<Router> {
             "</if>" +
             "</where>" +
             "</script>")
-    @ResultMap("BaseResultMap")
-    List<Router> findAllByPermissionName(@Param("permissions") List<String> permissions);
+    @ResultMap("routerResultMap")
+    List<Router> listByPermissions(@Param("permissions") List<String> permissions);
 
     @Delete("DELETE FROM router WHERE id = #{id}")
     void deleteById(Long id);
@@ -131,7 +137,8 @@ public interface RouterMapper extends BaseMapper<Router> {
            "#{id}" +
            "</foreach>" +
            "</script>")
-    List<String> findRouterPermissionsByIds(@Param("routerIds") List<Long> routerIds);
+    List<String> listPermissionsByRouterIds(@Param("routerIds") List<Long> routerIds);
+
     @Select("SELECT permission FROM router WHERE id = #{id}")
-    String findPermissionNameByRouterId(@Param("id") Long id);
+    String getPermissionById(@Param("id") Long id);
 }
