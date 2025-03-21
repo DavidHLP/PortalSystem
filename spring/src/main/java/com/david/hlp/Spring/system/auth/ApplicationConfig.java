@@ -1,7 +1,6 @@
 package com.david.hlp.Spring.system.auth;
 
 import com.david.hlp.Spring.system.mapper.UserMapper;
-import com.david.hlp.Spring.system.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

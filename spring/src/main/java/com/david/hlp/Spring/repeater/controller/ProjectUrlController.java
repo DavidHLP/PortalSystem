@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
 import com.david.hlp.Spring.repeater.entity.ProjectUrl;
-import com.david.hlp.Spring.repeater.service.ProjectUrlServiceImp;
+import com.david.hlp.Spring.repeater.service.ProjectUrlService;
 import com.david.hlp.Spring.common.enums.ResultCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/repeater/project-url")
 public class ProjectUrlController {
 
-    private final ProjectUrlServiceImp projectUrlService;
+    private final ProjectUrlService projectUrlService;
 
     /**
      * 分页查询所有项目URL
@@ -42,7 +42,7 @@ public class ProjectUrlController {
         if (pageInfo == null) {
             return Result.error(ResultCode.BAD_REQUEST);
         }
-        return Result.success(projectUrlService.findAll(
+        return Result.success(projectUrlService.getProjectUrlList(
             pageInfo.getPageSize(),
             pageInfo.getPageNum(),
             pageInfo.getQuery().getProjectName(),
@@ -63,7 +63,7 @@ public class ProjectUrlController {
         if (projectUrl == null || projectUrl.getId() == null) {
             return Result.error(ResultCode.BAD_REQUEST);
         }
-        projectUrlService.delete(projectUrl);
+        projectUrlService.removeProjectUrl(projectUrl);
         return Result.success("删除成功");
     }
 
@@ -81,7 +81,7 @@ public class ProjectUrlController {
         if (projectUrl == null || projectUrl.getId() == null) {
             return Result.error(ResultCode.BAD_REQUEST);
         }
-        projectUrlService.update(projectUrl);
+        projectUrlService.updateProjectUrl(projectUrl);
         return Result.success("更新成功");
     }
 }

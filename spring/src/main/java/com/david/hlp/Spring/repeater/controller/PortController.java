@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
 import com.david.hlp.Spring.repeater.entity.PortUrl;
-import com.david.hlp.Spring.repeater.service.PortServiceImp;
+import com.david.hlp.Spring.repeater.service.PortService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,7 +22,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.Map;
 import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class PortController {
     /**
      * 端口服务接口
      */
-    private final PortServiceImp portService;
+    private final PortService portService;
 
     /**
      * 获取端口列表
@@ -50,18 +50,18 @@ public class PortController {
      * @param number 端口号（可选）
      * @param page   页码，默认值为1
      * @param limit  每页数量，默认值为10
-     * @return Result<Map<String, Object>> 包含端口列表和总数的结果对象
+     * @return Result<PageInfo<PortUrl>> 包含端口列表和总数的结果对象
      */
     @Operation(summary = "获取端口列表", description = "可根据端口号筛选，支持分页查询")
     @ApiResponse(responseCode = "200", description = "查询成功",
                 content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = Result.class)))
     @GetMapping("/list")
-    public Result<Map<String, Object>> getPortList(
+    public Result<PageInfo<PortUrl>> getPortList(
             @Parameter(description = "端口号") @RequestParam(required = false) String number,
             @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer page,
             @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") Integer limit) {
-        Map<String, Object> data = portService.getPortList(number, page, limit);
+        PageInfo<PortUrl> data = portService.getPortList(limit, page, number);
         return Result.success(data);
     }
 

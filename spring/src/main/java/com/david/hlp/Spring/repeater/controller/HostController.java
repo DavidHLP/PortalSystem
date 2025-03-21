@@ -2,11 +2,11 @@ package com.david.hlp.Spring.repeater.controller;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.david.hlp.Spring.repeater.service.HostServiceImp;
 import com.david.hlp.Spring.common.enums.ResultCode;
 import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
 import com.david.hlp.Spring.repeater.entity.HostUrl;
+import com.david.hlp.Spring.repeater.service.HostService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/repeater/host-url")
 public class HostController {
-    private final HostServiceImp hostService;
+    private final HostService hostService;
 
     /**
      * 查询主机列表
@@ -50,7 +50,7 @@ public class HostController {
             @Parameter(description = "状态筛选") @RequestParam(required = false) Boolean isActive) {
 
         Integer offset = (page - 1) * limit;
-        PageInfo<HostUrl> data = hostService.findAllWithCount(limit, offset, address, isActive);
+        PageInfo<HostUrl> data = hostService.getHostList(limit, offset, address, isActive);
         return Result.success(data);
     }
 
@@ -63,8 +63,8 @@ public class HostController {
     @ApiResponse(responseCode = "200", description = "查询成功")
     @ApiResponse(responseCode = "404", description = "主机未找到")
     @GetMapping("/{id}")
-    public Result<HostUrl> findById(@Parameter(description = "主机ID") @PathVariable Integer id) {
-        HostUrl hostUrl = hostService.findById(id);
+    public Result<HostUrl> getHostById(@Parameter(description = "主机ID") @PathVariable Integer id) {
+        HostUrl hostUrl = hostService.getById(id);
         if (hostUrl != null) {
             return Result.success(hostUrl);
         }
@@ -81,8 +81,9 @@ public class HostController {
     @ApiResponse(responseCode = "400", description = "创建失败，地址已存在")
     @PostMapping
     public Result<HostUrl> create(@Parameter(description = "主机信息") @RequestBody HostUrl hostUrl) {
-        if (hostService.create(hostUrl)) {
-            return Result.success(hostUrl);
+        HostUrl createdHost = hostService.create(hostUrl);
+        if (createdHost != null) {
+            return Result.success(createdHost);
         }
         return Result.error(ResultCode.BAD_REQUEST, "添加失败，地址已存在");
     }
@@ -101,7 +102,8 @@ public class HostController {
             @Parameter(description = "主机ID") @PathVariable Integer id,
             @Parameter(description = "主机信息") @RequestBody HostUrl hostUrl) {
         hostUrl.setId(id);
-        if (hostService.update(hostUrl)) {
+        HostUrl updatedHost = hostService.update(hostUrl);
+        if (updatedHost != null) {
             return Result.success("更新成功");
         }
         return Result.error(ResultCode.BAD_REQUEST, "更新失败，主机不存在或地址已被使用");
@@ -117,10 +119,8 @@ public class HostController {
     @ApiResponse(responseCode = "404", description = "删除失败，主机不存在")
     @DeleteMapping("/{id}")
     public Result<String> delete(@Parameter(description = "主机ID") @PathVariable Integer id) {
-        if (hostService.delete(id)) {
-            return Result.success("删除成功");
-        }
-        return Result.error(ResultCode.NOT_FOUND, "删除失败，主机不存在");
+        hostService.deleteById(id);
+        return Result.success("删除成功");
     }
 
     /**
@@ -136,7 +136,7 @@ public class HostController {
     public Result<String> updateStatus(
             @Parameter(description = "主机ID") @PathVariable Integer id,
             @Parameter(description = "激活状态") @RequestParam Boolean isActive) {
-        if (hostService.updateStatus(id, isActive)) {
+        if (hostService.updateHostStatus(id, isActive)) {
             return Result.success("状态更新成功");
         }
         return Result.error(ResultCode.NOT_FOUND, "状态更新失败，主机不存在");

@@ -1,7 +1,7 @@
 package com.david.hlp.Spring.repeater.controller;
 
 import com.david.hlp.Spring.repeater.entity.RouterUrl;
-import com.david.hlp.Spring.repeater.service.RouterUrlServiceImp;
+import com.david.hlp.Spring.repeater.service.RouterUrlService;
 import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class RouterUrlController {
 
-    private final RouterUrlServiceImp routerUrlService;
+    private final RouterUrlService routerUrlService;
 
     @Operation(summary = "获取所有路由URL", description = "分页获取所有路由URL信息")
     @ApiResponse(responseCode = "200", description = "成功获取路由URL列表",
@@ -35,9 +35,7 @@ public class RouterUrlController {
             schema = @Schema(implementation = PageInfo.class)))
     @GetMapping
     public Result<PageInfo<RouterUrl>> findAll() {
-        PageInfo<RouterUrl> pageInfo = new PageInfo<>();
-        pageInfo.setItems(routerUrlService.findAll());
-        return Result.success(pageInfo);
+        return Result.success(routerUrlService.getRouterUrlList());
     }
 
     @Operation(summary = "根据ID获取路由URL", description = "通过ID查询单个路由URL信息")
@@ -46,7 +44,7 @@ public class RouterUrlController {
     public Result<RouterUrl> findById(
             @Parameter(description = "路由URL ID", required = true)
             @PathVariable Integer id) {
-        return Result.success(routerUrlService.findById(id));
+        return Result.success(routerUrlService.getById(id));
     }
 
     @Operation(summary = "创建路由URL", description = "创建新的路由URL")

@@ -1,4 +1,4 @@
-package com.david.hlp.Spring.repeater.service;
+package com.david.hlp.Spring.repeater.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

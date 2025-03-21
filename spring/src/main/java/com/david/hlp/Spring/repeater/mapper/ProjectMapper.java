@@ -19,7 +19,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 @Mapper
 public interface ProjectMapper extends BaseMapper<ProjectUrl> {
-    
+
     /**
      * 获取项目列表
      *
