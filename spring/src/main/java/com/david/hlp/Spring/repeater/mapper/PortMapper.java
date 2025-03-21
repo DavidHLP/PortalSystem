@@ -13,10 +13,10 @@ import java.util.List;
 import com.david.hlp.Spring.repeater.entity.PortUrl;
 
 @Mapper
-public interface PortMapper {   
+public interface PortMapper {
     /**
      * 获取端口列表（带条件查询）
-     * @param number 端口号（可选）
+     * @param portNumber 端口号（可选）
      * @param offset 偏移量
      * @param limit 限制数量
      * @return 端口列表
@@ -24,88 +24,93 @@ public interface PortMapper {
     @Select("<script>"
             + "SELECT * FROM port_url "
             + "<where>"
-            + "<if test='number != null and number != \"\"'>"
-            + "  number LIKE CONCAT('%', #{number}, '%') "
+            + "<if test='portNumber != null and portNumber != \"\"'>"
+            + "  number LIKE CONCAT('%', #{portNumber}, '%') "
             + "</if>"
             + "</where>"
             + "ORDER BY id DESC "
             + "LIMIT #{offset}, #{limit}"
             + "</script>")
-    List<PortUrl> selectPortList(@Param("number") String number, 
-                                @Param("offset") int offset, 
-                                @Param("limit") int limit);
-    
+    List<PortUrl> listPorts(@Param("portNumber") String portNumber,
+                           @Param("offset") int offset,
+                           @Param("limit") int limit);
+
     /**
      * 获取端口总数（带条件查询）
-     * @param number 端口号（可选）
+     * @param portNumber 端口号（可选）
      * @return 符合条件的端口总数
      */
     @Select("<script>"
             + "SELECT COUNT(*) FROM port_url "
             + "<where>"
-            + "<if test='number != null and number != \"\"'>"
-            + "  number LIKE CONCAT('%', #{number}, '%') "
+            + "<if test='portNumber != null and portNumber != \"\"'>"
+            + "  number LIKE CONCAT('%', #{portNumber}, '%') "
             + "</if>"
             + "</where>"
             + "</script>")
-    int countPort(@Param("number") String number);
-    
+    int getPortCount(@Param("portNumber") String portNumber);
+
     /**
      * 根据ID获取端口信息
-     * @param id 端口ID
+     * @param portId 端口ID
      * @return 端口信息
      */
-    @Select("SELECT * FROM port_url WHERE id = #{id}")
-    PortUrl selectPortById(@Param("id") Integer id);
-    
+    @Select("SELECT * FROM port_url WHERE id = #{portId}")
+    PortUrl getPortById(@Param("portId") Long portId);
+
     /**
      * 根据端口号获取端口信息
-     * @param number 端口号
+     * @param portNumber 端口号
      * @return 端口信息
      */
-    @Select("SELECT * FROM port_url WHERE number = #{number}")
-    PortUrl selectPortByNumber(@Param("number") String number);
-    
+    @Select("SELECT * FROM port_url WHERE number = #{portNumber}")
+    PortUrl getPortByNumber(@Param("portNumber") String portNumber);
+
     /**
      * 新增端口
-     * @param port 端口信息
+     * @param portUrl 端口信息
      * @return 影响行数
      */
     @Insert("INSERT INTO port_url(number, description) VALUES(#{number}, #{description})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
-    int insertPort(PortUrl port);
-    
+    int insertPort(PortUrl portUrl);
+
     /**
      * 更新端口信息
-     * @param port 端口信息
+     * @param portUrl 端口信息
      * @return 影响行数
      */
     @Update("UPDATE port_url SET number = #{number}, description = #{description} WHERE id = #{id}")
-    int updatePort(PortUrl port);
-    
+    int updatePort(PortUrl portUrl);
+
     /**
      * 删除端口
-     * @param id 端口ID
+     * @param portId 端口ID
      * @return 影响行数
      */
-    @Delete("DELETE FROM port_url WHERE id = #{id}")
-    int deletePort(@Param("id") Integer id);
-
-    @Select("SELECT * FROM port_url WHERE id = #{id}")
-    PortUrl findById(Integer id);
+    @Delete("DELETE FROM port_url WHERE id = #{portId}")
+    int deletePort(@Param("portId") Long portId);
 
     /**
-     * 获取所有端口信息
-     * 不包含描述
+     * 根据ID获取端口信息（包含所有字段）
+     * @param portId 端口ID
+     * @return 端口信息
+     */
+    @Select("SELECT * FROM port_url WHERE id = #{portId}")
+    PortUrl getPortByIdWithAllFields(@Param("portId") Integer portId);
+
+    /**
+     * 获取所有端口信息（仅包含ID和端口号）
      * @return 端口列表
      */
     @Select("SELECT id, number FROM port_url")
-    List<PortUrl> listAll();
+    List<PortUrl> listAllPorts();
 
     /**
-     * 根据ID查询端口
-     * 不包含描述
+     * 根据ID获取端口信息（仅包含ID和端口号）
+     * @param portId 端口ID
+     * @return 端口信息
      */
-    @Select("SELECT id, number FROM port_url WHERE id = #{id}")
-    PortUrl findByIdHasNoDescription(@Param("id") Integer id);
+    @Select("SELECT id, number FROM port_url WHERE id = #{portId}")
+    PortUrl getPortByIdWithoutDescription(@Param("portId") Integer portId);
 }

@@ -18,7 +18,7 @@ public class PortUrl {
     /**
      * 主键ID
      */
-    private Integer id;
+    private Long id;
     
     /**
      * 端口号（支持数字或字符串，如8080/ws）

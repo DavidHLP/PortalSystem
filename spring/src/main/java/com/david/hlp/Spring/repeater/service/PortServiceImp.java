@@ -29,8 +29,8 @@ public class PortServiceImp{
     public Map<String, Object> getPortList(String number, int page, int limit) {
         int offset = (page - 1) * limit;
         
-        List<PortUrl> portList = portMapper.selectPortList(number, offset, limit);
-        int total = portMapper.countPort(number);
+        List<PortUrl> portList = portMapper.listPorts(number, offset, limit);
+        int total = portMapper.getPortCount(number);
         
         Map<String, Object> result = new HashMap<>(2);
         result.put("items", portList);
@@ -44,8 +44,8 @@ public class PortServiceImp{
      * @param id 端口ID
      * @return 端口详情
      */
-    public PortUrl getPortById(Integer id) {
-        PortUrl port = portMapper.selectPortById(id);
+    public PortUrl getPortById(Long id) {
+        PortUrl port = portMapper.getPortById(id);
         if (port == null) {
             throw new BusinessException("端口不存在");
         }
@@ -60,7 +60,7 @@ public class PortServiceImp{
     @Transactional
     public PortUrl createPort(PortUrl port) {
         // 检查端口号是否已存在
-        PortUrl existPort = portMapper.selectPortByNumber(port.getNumber());
+        PortUrl existPort = portMapper.getPortByNumber(port.getNumber());
         if (existPort != null) {
             throw new BusinessException("端口号已存在");
         }
@@ -75,16 +75,16 @@ public class PortServiceImp{
      * @param port 端口信息
      */
     @Transactional
-    public void updatePort(Integer id, PortUrl port) {
+    public void updatePort(Long id, PortUrl port) {
         // 检查端口是否存在
-        PortUrl existPort = portMapper.selectPortById(id);
+        PortUrl existPort = portMapper.getPortById(id);
         if (existPort == null) {
             throw new BusinessException("端口不存在");
         }
         
         // 如果修改了端口号，需要检查新端口号是否已存在
         if (!existPort.getNumber().equals(port.getNumber())) {
-            PortUrl portWithSameNumber = portMapper.selectPortByNumber(port.getNumber());
+            PortUrl portWithSameNumber = portMapper.getPortByNumber(port.getNumber());
             if (portWithSameNumber != null) {
                 throw new BusinessException("端口号已存在");
             }
@@ -99,9 +99,9 @@ public class PortServiceImp{
      * @param id 端口ID
      */
     @Transactional
-    public void deletePort(Integer id) {
+    public void deletePort(Long id) {
         // 检查端口是否存在
-        PortUrl existPort = portMapper.selectPortById(id);
+        PortUrl existPort = portMapper.getPortById(id);
         if (existPort == null) {
             throw new BusinessException("端口不存在");
         }
@@ -110,6 +110,6 @@ public class PortServiceImp{
     }
 
     public List<PortUrl> listAll() {
-        return portMapper.listAll();
+        return portMapper.listAllPorts();
     }
 }

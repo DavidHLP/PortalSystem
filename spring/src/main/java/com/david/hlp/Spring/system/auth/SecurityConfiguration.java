@@ -27,8 +27,14 @@ public class SecurityConfiguration {
                     "/api/user/**",
                     "/api/role/**",
                     "/api/repeater/**",
+                    "/doc.html",
+                    "/doc.html/**",
+                    "/v3/api-docs",
                     "/v3/api-docs/**",
-                    "/swagger-ui/**",
+                    "/webjars/**",
+                    "/authenticate",
+                    "/swagger-ui.html/**",
+                    "/swagger-resources",
                     "/swagger-resources/**"
                 ).permitAll()
                 .anyRequest().authenticated()

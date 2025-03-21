@@ -32,10 +32,10 @@ public class PathUrlServiceImp {
     public List<Url> findAll() {
         List<Url> urls = pathUrlMapper.findAll();
         for (Url url : urls) {
-            url.setHost(hostMapper.findByIdHasNoDescription(url.getHostId()));
-            url.setPort(portMapper.findByIdHasNoDescription(url.getPortId()));
-            url.setRouter(routerMapper.findByIdHasNoCreatedAt(url.getRouterId()));
-            url.setProject(projectMapper.findByIdHasNoDescription(url.getProjectId()));
+            url.setHost(hostMapper.getHostBasicInfoById(url.getHostId()));
+            url.setPort(portMapper.getPortByIdWithoutDescription(url.getPortId()));
+            url.setRouter(routerMapper.getRouterUrlByIdWithoutCreatedAt(url.getRouterId()));
+            url.setProject(projectMapper.getProjectBasicInfoById(url.getProjectId()));
         }
         return urls;
     }
@@ -49,10 +49,10 @@ public class PathUrlServiceImp {
         long total = pathUrlMapper.countByConditions(routerId, hostId, portId, projectId, method, isActive, protocol);
         // 填充关联数据
         for (Url url : urls) {
-            url.setHost(hostMapper.findByIdHasNoDescription(url.getHostId()));
-            url.setPort(portMapper.findByIdHasNoDescription(url.getPortId()));
-            url.setRouter(routerMapper.findByIdHasNoCreatedAt(url.getRouterId()));
-            url.setProject(projectMapper.findByIdHasNoDescription(url.getProjectId()));
+            url.setHost(hostMapper.getHostBasicInfoById(url.getHostId()));
+            url.setPort(portMapper.getPortByIdWithoutDescription(url.getPortId()));
+            url.setRouter(routerMapper.getRouterUrlByIdWithoutCreatedAt(url.getRouterId()));
+            url.setProject(projectMapper.getProjectBasicInfoById(url.getProjectId()));
         }
         // 构建返回结果
         HashMap<String, ProjectUrlRequest> projectUrlRequestMap = new HashMap<>();

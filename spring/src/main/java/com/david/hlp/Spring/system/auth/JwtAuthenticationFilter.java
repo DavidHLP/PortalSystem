@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,6 +36,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   // 用于检查 JWT 是否在数据库中有效
   private final TokenMapper tokenMapper;
+
+
+  private final String[] publicPaths = {
+    "/api/auth/demo/login",
+    "/api/auth/demo/register",
+    "/api/auth/demo/logout",
+    "/api/auth/demo/refresh-token",
+    "/swagger-ui/**",
+    "/doc.html",
+    "/doc.html/**",
+    "/v3/api-docs",
+    "/v3/api-docs/**",
+    "/webjars/**",
+    "/authenticate",
+    "/swagger-ui.html/**",
+    "/swagger-resources",
+    "/swagger-resources/**"
+  };
 
 
   /**
@@ -60,7 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 1. 检查是否为公开路径
     String path = request.getServletPath();
-    boolean isPublicPath = path.equals("/api/auth/demo/login") || path.equals("/api/auth/demo/register");
+    boolean isPublicPath = Arrays.stream(publicPaths).anyMatch(path::equals);
 
     // 2. 检查Authorization头
     final String authHeader = request.getHeader("Authorization");

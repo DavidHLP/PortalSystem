@@ -6,17 +6,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
+import lombok.ToString;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Result<T> {
-    private int code;
+    private Integer code;
     private String message;
     private T data;
-    private long timestamp = System.currentTimeMillis();
+    private Long timestamp;
 
-    public Result(int code, String message, T data) {
+    public Result(Integer code, String message, T data) {
         this.code = code;
         this.message = message;
         this.data = data;
@@ -30,6 +33,7 @@ public class Result<T> {
         return Result.<T>builder()
                 .code(ResultCode.SUCCESS.getCode())
                 .message(ResultCode.SUCCESS.getMessage())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -38,6 +42,7 @@ public class Result<T> {
                 .code(ResultCode.SUCCESS.getCode())
                 .message(ResultCode.SUCCESS.getMessage())
                 .data(data)
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -45,13 +50,15 @@ public class Result<T> {
         return Result.<T>builder()
                 .code(ResultCode.SUCCESS.getCode())
                 .message(message)
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
-    public static <T> Result<T> error(int code, String message) {
+    public static <T> Result<T> error(Integer code, String message) {
         return Result.<T>builder()
                 .code(code)
                 .message(message)
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -59,6 +66,7 @@ public class Result<T> {
         return Result.<T>builder()
                 .code(code.getCode())
                 .message(code.getMessage())
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
@@ -66,6 +74,7 @@ public class Result<T> {
         return Result.<T>builder()
                 .code(code.getCode())
                 .message(customMessage)
+                .timestamp(System.currentTimeMillis())
                 .build();
     }
 }

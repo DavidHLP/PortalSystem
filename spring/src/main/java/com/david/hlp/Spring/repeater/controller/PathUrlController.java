@@ -13,7 +13,6 @@ import com.david.hlp.Spring.repeater.service.RouterUrlServiceImp;
 import com.david.hlp.Spring.repeater.service.ProjectUrlServiceImp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import java.util.Arrays;
 import com.david.hlp.Spring.repeater.entity.ProjectUrlRequest;
 import com.david.hlp.Spring.common.result.PageInfo;
 
@@ -61,7 +60,7 @@ public class PathUrlController {
 
     @GetMapping("/listAllRouter")
     public Result<List<RouterUrl>> listAllRouter() {
-        return Result.success(routerUrlService.listAll());
+        return Result.success(routerUrlService.listRouterUrls());
     }
 
     @GetMapping("/listAllProject")

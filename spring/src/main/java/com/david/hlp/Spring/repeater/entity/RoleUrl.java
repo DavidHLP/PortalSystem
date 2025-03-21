@@ -19,29 +19,29 @@ public class RoleUrl {
      * 主键ID
      */
     private Integer id;
-    
+
     /**
      * 关联项目ID
      */
     private Integer projectId;
-    
+
     /**
      * 关联项目对象
      */
     private ProjectUrl project;
-    
+
     /**
      * 角色名称
      */
     private String roleName;
-    
+
     /**
      * 角色描述
      */
     private String description;
-    
+
     /**
      * 创建时间
      */
     private LocalDateTime createdAt;
-} 
+}

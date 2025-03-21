@@ -23,8 +23,8 @@ public class HostServiceImp {
      * @return 包含主机列表和总数的Map
      */
     public PageInfo<HostUrl> findAllWithCount(Integer limit, Integer offset, String address, Boolean isActive) {
-        List<HostUrl> hosts = hostMapper.findAll(limit, offset, address, isActive);
-        long total = hostMapper.countByLimitAndOffset(limit, offset, address, isActive);
+        List<HostUrl> hosts = hostMapper.listHosts(limit, offset, address, isActive);
+        long total = hostMapper.getHostCount(limit, offset, address, isActive);
 
         return PageInfo.<HostUrl>builder()
             .items(hosts)
@@ -40,7 +40,7 @@ public class HostServiceImp {
      * @return 主机信息
      */
     public HostUrl findById(Integer id) {
-        return hostMapper.findById(id);
+        return hostMapper.getHostById(id);
     }
 
     /**
@@ -50,10 +50,10 @@ public class HostServiceImp {
      */
     public boolean create(HostUrl hostUrl) {
         // 检查地址是否已存在
-        if (hostMapper.existsByAddress(hostUrl.getAddress()) > 0) {
+        if (hostMapper.checkHostAddressExists(hostUrl.getAddress()) > 0) {
             return false;
         }
-        return hostMapper.insert(hostUrl) > 0;
+        return hostMapper.insertHost(hostUrl) > 0;
     }
 
     /**
@@ -63,19 +63,19 @@ public class HostServiceImp {
      */
     public boolean update(HostUrl hostUrl) {
         // 获取旧数据
-        HostUrl oldHost = hostMapper.findById(hostUrl.getId());
+        HostUrl oldHost = hostMapper.getHostById(hostUrl.getId());
         if (oldHost == null) {
             return false;
         }
 
         // 如果地址变更了，则检查新地址是否已存在
         if (!oldHost.getAddress().equals(hostUrl.getAddress())) {
-            if (hostMapper.existsByAddress(hostUrl.getAddress()) > 0) {
+            if (hostMapper.checkHostAddressExists(hostUrl.getAddress()) > 0) {
                 return false;
             }
         }
 
-        return hostMapper.update(hostUrl) > 0;
+        return hostMapper.updateHost(hostUrl) > 0;
     }
 
     /**
@@ -84,7 +84,7 @@ public class HostServiceImp {
      * @return 删除结果
      */
     public boolean delete(Integer id) {
-        return hostMapper.deleteById(id) > 0;
+        return hostMapper.deleteHostById(id) > 0;
     }
 
     /**
@@ -94,16 +94,16 @@ public class HostServiceImp {
      * @return 更新结果
      */
     public boolean updateStatus(Integer id, Boolean isActive) {
-        HostUrl hostUrl = hostMapper.findById(id);
+        HostUrl hostUrl = hostMapper.getHostById(id);
         if (hostUrl == null) {
             return false;
         }
 
         hostUrl.setIsActive(isActive);
-        return hostMapper.update(hostUrl) > 0;
+        return hostMapper.updateHost(hostUrl) > 0;
     }
 
     public List<HostUrl> listAll() {
-        return hostMapper.listAll();
+        return hostMapper.listAllHosts();
     }
 }

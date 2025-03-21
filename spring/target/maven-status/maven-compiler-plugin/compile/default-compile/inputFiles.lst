@@ -1,4 +1,4 @@
-/home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/SpringApplication.java
+/home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/SpringBootStarter.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/common/enums/ResultCode.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/common/exception/ApiException.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/common/exception/BusinessException.java
@@ -26,6 +26,7 @@
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/repeater/mapper/PathUrlMapper.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/repeater/mapper/PortMapper.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/repeater/mapper/ProjectMapper.java
+/home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/repeater/mapper/RoleUrlMapper.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/repeater/mapper/RouterUrlMapper.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/repeater/service/HostServiceImp.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/repeater/service/PathUrlServiceImp.java
@@ -40,6 +41,7 @@
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/system/auth/JwtService.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/system/auth/LogoutService.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/system/auth/SecurityConfiguration.java
+/home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/system/auth/WebMvcConfig.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/system/config/CacheConfig.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/system/controller/AuthController.java
 /home/david/Project/springcloud/spring/src/main/java/com/david/hlp/Spring/system/controller/BaseController.java

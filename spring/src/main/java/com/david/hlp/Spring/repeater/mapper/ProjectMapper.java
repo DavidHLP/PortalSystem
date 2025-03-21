@@ -11,14 +11,28 @@ import org.apache.ibatis.annotations.Param;
 import com.david.hlp.Spring.repeater.entity.ProjectUrl;
 import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * 项目URL映射接口
+ *
+ * @author david
+ */
 @Mapper
 public interface ProjectMapper extends BaseMapper<ProjectUrl> {
+    
     /**
-     * 查询所有项目
+     * 获取项目列表
+     *
+     * @param limit 限制条数
+     * @param offset 偏移量
+     * @param projectName 项目名称
+     * @param projectInterfaceName 接口名称
+     * @return 项目列表
      */
     @Select("""
             <script>
-                SELECT * FROM project_url
+                SELECT id, project_name, project_interface_name, description 
+                FROM project_url
                 <where>
                     <if test='projectName != null'>project_name LIKE CONCAT('%', #{projectName}, '%')</if>
                     <if test='projectInterfaceName != null'>AND project_interface_name LIKE CONCAT('%', #{projectInterfaceName}, '%')</if>
@@ -27,45 +41,65 @@ public interface ProjectMapper extends BaseMapper<ProjectUrl> {
                 <if test='offset != null'>OFFSET #{offset}</if>
             </script>
             """)
-    List<ProjectUrl> findAll(@Param("limit") Integer limit, @Param("offset") Integer offset, @Param("projectName") String projectName, @Param("projectInterfaceName") String projectInterfaceName);
+    List<ProjectUrl> listProjects(@Param("limit") Integer limit, @Param("offset") Integer offset, 
+            @Param("projectName") String projectName, @Param("projectInterfaceName") String projectInterfaceName);
 
     /**
-     * 根据ID查询项目
+     * 根据ID获取项目信息
+     *
+     * @param id 项目ID
+     * @return 项目信息
      */
-    @Select("SELECT * FROM project_url WHERE id = #{id}")
-    ProjectUrl findById(@Param("id") Integer id);
+    @Select("SELECT id, project_name, project_interface_name, description FROM project_url WHERE id = #{id}")
+    ProjectUrl getProjectById(@Param("id") Integer id);
 
     /**
-     * 插入新项目
+     * 新增项目
+     *
+     * @param projectUrl 项目信息
+     * @return 影响行数
      */
     @Insert("INSERT INTO project_url(project_name, project_interface_name, description) " +
             "VALUES(#{projectName}, #{projectInterfaceName}, #{description})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insert(ProjectUrl projectUrl);
+    int insertProject(ProjectUrl projectUrl);
 
     /**
      * 更新项目信息
+     *
+     * @param projectUrl 项目信息
+     * @return 影响行数
      */
     @Update("UPDATE project_url SET project_name = #{projectName}, " +
             "project_interface_name = #{projectInterfaceName}, " +
             "description = #{description} " +
             "WHERE id = #{id}")
-    int update(ProjectUrl projectUrl);
+    int updateProject(ProjectUrl projectUrl);
 
     /**
      * 根据ID删除项目
+     *
+     * @param id 项目ID
+     * @return 影响行数
      */
     @Delete("DELETE FROM project_url WHERE id = #{id}")
-    int deleteById(@Param("id") Integer id);
+    int deleteProjectById(@Param("id") Integer id);
 
     /**
      * 检查项目名称是否存在
+     *
+     * @param projectName 项目名称
+     * @return 存在返回1，不存在返回0
      */
     @Select("SELECT COUNT(1) FROM project_url WHERE project_name = #{projectName}")
-    int existsByProjectName(@Param("projectName") String projectName);
+    int checkProjectNameExists(@Param("projectName") String projectName);
 
     /**
      * 获取项目总数
+     *
+     * @param projectName 项目名称
+     * @param projectInterfaceName 接口名称
+     * @return 项目总数
      */
     @Select("""
             <script>
@@ -76,20 +110,22 @@ public interface ProjectMapper extends BaseMapper<ProjectUrl> {
                 </where>
             </script>
             """)
-    long countByLimitAndOffset(@Param("limit") Integer limit, @Param("offset") Integer offset, @Param("projectName") String projectName, @Param("projectInterfaceName") String projectInterfaceName);
+    long getProjectCount(@Param("projectName") String projectName, @Param("projectInterfaceName") String projectInterfaceName);
 
     /**
-     * 获取所有项目信息
-     * 不包含解释文档
-     * @return 项目列表
+     * 获取所有项目基本信息列表
+     *
+     * @return 项目基本信息列表
      */
     @Select("SELECT id, project_name, project_interface_name FROM project_url")
-    List<ProjectUrl> listAll();
+    List<ProjectUrl> listProjectBasicInfo();
 
     /**
-     * 根据ID查询项目
-     * 不包含解释文档
+     * 根据ID获取项目基本信息
+     *
+     * @param id 项目ID
+     * @return 项目基本信息
      */
     @Select("SELECT id, project_name, project_interface_name FROM project_url WHERE id = #{id}")
-    ProjectUrl findByIdHasNoDescription(@Param("id") Integer id);
+    ProjectUrl getProjectBasicInfoById(@Param("id") Integer id);
 }

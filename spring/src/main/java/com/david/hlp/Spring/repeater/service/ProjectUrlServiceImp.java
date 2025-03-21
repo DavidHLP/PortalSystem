@@ -19,12 +19,12 @@ public class ProjectUrlServiceImp {
         Integer offset = (pageNum - 1) * pageSize;
         Integer limit = pageSize * pageNum;
 
-        List<ProjectUrl> projectUrls = projectMapper.findAll(limit, offset, projectName, projectInterfaceName);
+        List<ProjectUrl> projectUrls = projectMapper.listProjects(limit, offset, projectName, projectInterfaceName);
         return PageInfo.<ProjectUrl>builder()
             .items(projectUrls)
             .pageNum(pageNum)
             .pageSize(pageSize)
-            .total(projectMapper.countByLimitAndOffset(limit, offset, projectName, projectInterfaceName))
+            .total(projectMapper.getProjectCount(projectName, projectInterfaceName))
             .build();
     }
 
@@ -37,6 +37,6 @@ public class ProjectUrlServiceImp {
     }
 
     public List<ProjectUrl> listAll() {
-        return projectMapper.listAll();
+        return projectMapper.listProjectBasicInfo();
     }
 }

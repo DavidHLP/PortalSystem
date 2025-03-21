@@ -12,10 +12,10 @@ import java.util.List;
 public class RouterUrlServiceImp {
     private final RouterUrlMapper routerUrlMapper;
     public List<RouterUrl> findAll() {
-        return routerUrlMapper.findAll();
+        return routerUrlMapper.listRouterUrls();
     }
     public RouterUrl findById(Integer id) {
-        return routerUrlMapper.findById(id);
+        return routerUrlMapper.getRouterUrlById(id);
     }
     public RouterUrl create(RouterUrl routerUrl) {
         routerUrl.setCreatedAt(LocalDateTime.now());
@@ -30,7 +30,7 @@ public class RouterUrlServiceImp {
         routerUrlMapper.deleteById(id);
     }
 
-    public List<RouterUrl> listAll() {
-        return routerUrlMapper.listAll();
+    public List<RouterUrl> listRouterUrls() {
+        return routerUrlMapper.listRouterUrls();
     }
 }
