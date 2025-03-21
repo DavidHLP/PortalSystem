@@ -1,15 +1,3 @@
-file://<WORKSPACE>/src/main/java/com/david/hlp/Spring/system/auth/JwtAuthenticationFilter.java
-### java.util.NoSuchElementException: next on empty iterator
-
-occurred in the presentation compiler.
-
-presentation compiler configuration:
-
-
-action parameters:
-uri: file://<WORKSPACE>/src/main/java/com/david/hlp/Spring/system/auth/JwtAuthenticationFilter.java
-text:
-```scala
 package com.david.hlp.Spring.system.auth;
 
 import com.david.hlp.Spring.system.mapper.TokenMapper;
@@ -64,36 +52,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           @NonNull HttpServletResponse response,
           @NonNull FilterChain filterChain
   ) throws ServletException, IOException {
-    // 直接放行的接口路径
-    if (request.getServletPath().startsWith("/api/auth/demo/login")) {
-      log.info("直接放行的接口路径: {}", request.getServletPath());
-      filterChain.doFilter(request, response);
-      return;
+    // 总是允许 OPTIONS 请求通过（CORS预检请求）
+    if (request.getMethod().equals("OPTIONS")) {
+        filterChain.doFilter(request, response);
+        return;
     }
 
-    // 2. 从请求头中获取 Authorization 信息
+    // 1. 检查是否为公开路径
+    String path = request.getServletPath();
+    boolean isPublicPath = path.equals("/api/auth/demo/login") || path.equals("/api/auth/demo/register");
+
+    // 2. 检查Authorization头
     final String authHeader = request.getHeader("Authorization");
-    final String jwt;
-    final String userEmail;
 
-    // 如果 Authorization 头为空或者不以 "Bearer " 开头，直接放行
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-      filterChain.doFilter(request, response);
-      return;
+    // 3. 如果不是公开路径且没有有效token，直接返回401
+    if (!isPublicPath && (authHeader == null || !authHeader.startsWith("Bearer "))) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
     }
 
-    // 提取 JWT（移除 "Bearer " 前缀）并解析用户邮箱
-    jwt = authHeader.substring(7);
-    userEmail = jwtService.extractUsername(jwt);
+    // 4. 如果是公开路径，允许通过
+    if (isPublicPath) {
+        filterChain.doFilter(request, response);
+        return;
+    }
 
+    // 5. 处理正常的带token请求
+    final String jwt = authHeader.substring(7);
+    final String userEmail = jwtService.extractUsername(jwt);
 
-    // 3. 验证用户邮箱和认证上下文
+    // 验证用户并设置认证信息
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       // 从 UserDetailsService 加载用户信息
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
       // 检查 JWT 是否在数据库中有效，且未过期或撤销
-      var isTokenValid = tokenMapper.isTokenValid(jwt);
+      var isTokenValid = tokenMapper.checkTokenValid(jwt);
 
       // 验证 JWT 是否有效
       if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
@@ -109,12 +103,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 new WebAuthenticationDetailsSource().buildDetails(request)
         );
 
+        log.info("认证成功，设置认证信息: {}", authToken);
+
         // 确保在认证成功后设置SecurityContext
         SecurityContextHolder.getContext().setAuthentication(authToken);
       }
     }
 
-    // 4. 放行请求到过滤器链的下一个过滤器
     filterChain.doFilter(request, response);
   }
 
@@ -123,29 +118,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   //   return request.getServletPath().startsWith("/api/auth/");
   // }
 }
-```
-
-
-
-#### Error stacktrace:
-
-```
-scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
-	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
-	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
-	scala.collection.IterableOps.head(Iterable.scala:222)
-	scala.collection.IterableOps.head$(Iterable.scala:222)
-	scala.collection.AbstractIterable.head(Iterable.scala:935)
-	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:164)
-	dotty.tools.pc.MetalsDriver.run(MetalsDriver.scala:45)
-	dotty.tools.pc.WithCompilationUnit.<init>(WithCompilationUnit.scala:31)
-	dotty.tools.pc.SimpleCollector.<init>(PcCollector.scala:345)
-	dotty.tools.pc.PcSemanticTokensProvider$Collector$.<init>(PcSemanticTokensProvider.scala:63)
-	dotty.tools.pc.PcSemanticTokensProvider.Collector$lzyINIT1(PcSemanticTokensProvider.scala:63)
-	dotty.tools.pc.PcSemanticTokensProvider.Collector(PcSemanticTokensProvider.scala:63)
-	dotty.tools.pc.PcSemanticTokensProvider.provide(PcSemanticTokensProvider.scala:88)
-	dotty.tools.pc.ScalaPresentationCompiler.semanticTokens$$anonfun$1(ScalaPresentationCompiler.scala:109)
-```
-#### Short summary: 
-
-java.util.NoSuchElementException: next on empty iterator
