@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.david.hlp.Spring.repeater.mapper.ProjectMapper">
+    <resultMap id="BaseResultMap" type="com.david.hlp.Spring.repeater.entity.ProjectUrl">
+        <id column="id" property="id"/>
+        <result column="project_name" property="projectName"/>
+        <result column="project_interface_name" property="projectInterfaceName"/>
+        <result column="description" property="description"/>
+    </resultMap>
+
+    <select id="listProjects" resultMap="BaseResultMap">
+        SELECT id, project_name, project_interface_name, description
+        FROM project_url
+        <where>
+            <if test="projectName != null">project_name LIKE CONCAT('%', #{projectName}, '%')</if>
+            <if test="projectInterfaceName != null">AND project_interface_name LIKE CONCAT('%', #{projectInterfaceName}, '%')</if>
+        </where>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+
+    <select id="getProjectById" resultMap="BaseResultMap">
+        SELECT id, project_name, project_interface_name, description 
+        FROM project_url 
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertProject" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO project_url(project_name, project_interface_name, description)
+        VALUES(#{projectName}, #{projectInterfaceName}, #{description})
+    </insert>
+
+    <update id="updateProject">
+        UPDATE project_url 
+        SET project_name = #{projectName},
+            project_interface_name = #{projectInterfaceName},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteProjectById">
+        DELETE FROM project_url WHERE id = #{id}
+    </delete>
+
+    <select id="checkProjectNameExists" resultType="int">
+        SELECT COUNT(1) FROM project_url WHERE project_name = #{projectName}
+    </select>
+
+    <select id="getProjectCount" resultType="long">
+        SELECT COUNT(1) FROM project_url
+        <where>
+            <if test="projectName != null">project_name LIKE CONCAT('%', #{projectName}, '%')</if>
+            <if test="projectInterfaceName != null">AND project_interface_name LIKE CONCAT('%', #{projectInterfaceName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="listProjectBasicInfo" resultMap="BaseResultMap">
+        SELECT id, project_name, project_interface_name FROM project_url
+    </select>
+
+    <select id="getProjectBasicInfoById" resultMap="BaseResultMap">
+        SELECT id, project_name, project_interface_name 
+        FROM project_url 
+        WHERE id = #{id}
+    </select>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT id, project_name, project_interface_name, description 
+        FROM project_url 
+        WHERE id = #{id}
+    </select>
+</mapper> 

@@ -2,8 +2,9 @@ import request from '@/utils/request/request'
 import type { ProjectUrl } from '@/api/repeater/projectUrl'
 import type { RouterUrl } from './routerurl'
 import type { PortUrl } from './porturl'
-import type { HostUrl, QueryParams } from './host_url'
+import type { HostUrl } from './host_url'
 import type { PageInfo } from '@/utils/types/common'
+
 export interface GroupedProject {
   projectId: number
   projectName: string
@@ -35,11 +36,29 @@ export interface Url {
   project?: ProjectUrl
 }
 
+export interface QueryParams {
+  protocol: string
+  method: string
+  isActive: boolean | undefined
+  hostId?: number
+  portId?: number
+  routerId?: number
+  projectId?: number
+  page: number
+  limit: number
+  sortField?: string
+  sortOrder?: 'asc' | 'desc'
+}
+
 export const getUrlList = (queryParams: QueryParams):Promise<PageInfo<GroupedProject>> => {
   return request({
     url: '/api/repeater/path-urls',
     method: 'get',
-    params: queryParams
+    params: {
+      ...queryParams,
+      page: queryParams.page || 1,
+      limit: queryParams.limit || 10
+    }
   })
 }
 
@@ -97,6 +116,20 @@ export const listAllRouter = ():Promise<RouterUrl[]> => {
 export const listAllProject = ():Promise<ProjectUrl[]> => {
   return request({
     url: '/api/repeater/path-urls/listAllProject',
+    method: 'get'
+  })
+}
+
+export const getByProjectId = (projectId: number):Promise<Url[]> => {
+  return request({
+    url: `/api/repeater/path-urls/getByProjectId?projectId=${projectId}`,
+    method: 'get'
+  })
+}
+
+export const listAll = ():Promise<Url[]> => {
+  return request({
+    url: '/api/repeater/path-urls/listAll',
     method: 'get'
   })
 }

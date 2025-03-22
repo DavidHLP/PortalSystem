@@ -6,12 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
+import java.io.Serializable;
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Url {
+public class Url implements Serializable {
     private Integer id;
     private String protocol;
     private Integer hostId;

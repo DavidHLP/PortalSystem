@@ -19,6 +19,7 @@ import com.david.hlp.Spring.common.enums.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * 全局异常处理器
@@ -63,8 +64,10 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException ex) {
         log.warn("参数类型不匹配: {}", ex.getMessage());
-        String errorMsg = String.format("参数'%s'类型错误，应为: %s", ex.getName(), 
-            ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "未知类型");
+        String errorMsg = String.format("参数'%s'类型错误，应为: %s", ex.getName(),
+            Optional.ofNullable(ex.getRequiredType())
+                .map(Class::getSimpleName)
+                .orElse("未知类型"));
         return Result.error(ResultCode.BAD_REQUEST, errorMsg);
     }
 
@@ -91,9 +94,9 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public Result<?> handleHttpRequestMethodNotSupportedException(final HttpRequestMethodNotSupportedException ex) {
         log.warn("请求方法不支持: {}", ex.getMessage());
-        return Result.error(ResultCode.METHOD_NOT_ALLOWED, 
-            String.format("不支持%s请求方法，支持的方法: %s", 
-                ex.getMethod(), 
+        return Result.error(ResultCode.METHOD_NOT_ALLOWED,
+            String.format("不支持%s请求方法，支持的方法: %s",
+                ex.getMethod(),
                 String.join(", ", ex.getSupportedMethods() != null ? ex.getSupportedMethods() : new String[0])));
     }
 

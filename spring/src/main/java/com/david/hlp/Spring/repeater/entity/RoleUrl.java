@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
+import java.io.Serializable;
 /**
  * 角色URL实体类
  */
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleUrl {
+public class RoleUrl implements Serializable {
     /**
      * 主键ID
      */

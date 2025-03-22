@@ -264,6 +264,7 @@
           v-model:page-size="queryParams.limit"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
+          :disabled="loading"
           layout="total, sizes, prev, pager, next, jumper"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -599,6 +600,7 @@ const total = ref(0)
 
 const handleSizeChange = (val: number) => {
   queryParams.value.limit = val
+  queryParams.value.page = 1 // 切换每页条数时重置为第一页
   fetchData(queryParams.value)
 }
 

@@ -51,12 +51,8 @@ public class ProjectUrlServiceImpl implements ProjectUrlService {
      * @return 项目URL列表
      */
     @Override
-    public PageInfo<ProjectUrl> listAll() {
-        List<ProjectUrl> projectUrls = projectMapper.listProjectBasicInfo();
-        return PageInfo.<ProjectUrl>builder()
-            .items(projectUrls)
-            .total((long)projectUrls.size())
-            .build();
+    public List<ProjectUrl> listAll() {
+        return projectMapper.listProjectBasicInfo();
     }
 
     /**
@@ -89,10 +85,12 @@ public class ProjectUrlServiceImpl implements ProjectUrlService {
      * @return 分页结果
      */
     @Override
-    public PageInfo<ProjectUrl> getPage(Integer pageNum, Integer pageSize) {
+    public PageInfo<ProjectUrl> getPage(Integer pageNum, Integer pageSize, ProjectUrl entity) {
         Integer offset = (pageNum - 1) * pageSize;
-        List<ProjectUrl> projectUrls = projectMapper.listProjects(pageSize, offset, null, null);
-        Long total = projectMapper.getProjectCount(null, null);
+        String projectName = entity != null ? entity.getProjectName() : null;
+        String projectInterfaceName = entity != null ? entity.getProjectInterfaceName() : null;
+        List<ProjectUrl> projectUrls = projectMapper.listProjects(pageSize, offset, projectName, projectInterfaceName);
+        Long total = projectMapper.getProjectCount(projectName, projectInterfaceName);
         return PageInfo.<ProjectUrl>builder()
             .items(projectUrls)
             .pageNum(pageNum)

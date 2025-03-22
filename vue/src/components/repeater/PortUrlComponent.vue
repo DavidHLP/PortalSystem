@@ -143,8 +143,8 @@
           background
           layout="total, sizes, prev, pager, next, jumper"
           :page-sizes="[10, 20, 50, 100]"
-          :page-size="queryParams.limit"
-          :current-page="queryParams.page"
+          :page-size="queryParams.pageSize"
+          :current-page="queryParams.pageNum"
           :total="total"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -272,8 +272,8 @@ import type { PageInfo } from '@/utils/types/common'
 
 // 查询参数
 const queryParams = reactive<QueryParams>({
-  page: 1,
-  limit: 10,
+  pageNum: 1,
+  pageSize: 10,
   number: ''
 })
 
@@ -328,7 +328,7 @@ const fetchData = async () => {
 
 // 查询
 const handleQuery = () => {
-  queryParams.page = 1
+  queryParams.pageNum = 1
   fetchData()
 }
 
@@ -340,12 +340,13 @@ const resetQuery = () => {
 
 // 分页处理
 const handleSizeChange = (size: number) => {
-  queryParams.limit = size
+  queryParams.pageSize = size
+  queryParams.pageNum = 1
   fetchData()
 }
 
 const handleCurrentChange = (page: number) => {
-  queryParams.page = page
+  queryParams.pageNum = page
   fetchData()
 }
 

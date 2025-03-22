@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.annotation.Validated;
 
 import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
@@ -37,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/repeater/port-url")
 @RequiredArgsConstructor
+@Validated
 public class PortController {
 
     /**
@@ -48,9 +50,9 @@ public class PortController {
      * 获取端口列表
      *
      * @param number 端口号（可选）
-     * @param page   页码，默认值为1
-     * @param limit  每页数量，默认值为10
-     * @return Result<PageInfo<PortUrl>> 包含端口列表和总数的结果对象
+     * @param pageNum 页码，默认值为1
+     * @param pageSize 每页数量，默认值为10
+     * @return 包含端口列表和总数的结果对象
      */
     @Operation(summary = "获取端口列表", description = "可根据端口号筛选，支持分页查询")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -59,9 +61,9 @@ public class PortController {
     @GetMapping("/list")
     public Result<PageInfo<PortUrl>> getPortList(
             @Parameter(description = "端口号") @RequestParam(required = false) String number,
-            @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer page,
-            @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") Integer limit) {
-        PageInfo<PortUrl> data = portService.getPortList(limit, page, number);
+            @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer pageNum,
+            @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") Integer pageSize) {
+        PageInfo<PortUrl> data = portService.getPortList(pageNum, pageSize, number);
         return Result.success(data);
     }
 
@@ -69,7 +71,7 @@ public class PortController {
      * 获取端口详情
      *
      * @param id 端口ID
-     * @return Result<PortUrl> 包含端口详情的结果对象
+     * @return 包含端口详情的结果对象
      */
     @Operation(summary = "获取端口详情", description = "根据ID获取端口详细信息")
     @ApiResponse(responseCode = "200", description = "查询成功",
@@ -88,7 +90,7 @@ public class PortController {
      * 创建端口
      *
      * @param port 端口信息
-     * @return Result<PortUrl> 包含创建后的端口信息的结果对象
+     * @return 包含创建后的端口信息的结果对象
      */
     @Operation(summary = "创建端口", description = "创建新的端口URL配置")
     @ApiResponse(responseCode = "200", description = "创建成功",
@@ -97,7 +99,7 @@ public class PortController {
     @PostMapping
     public Result<PortUrl> createPort(
             @Parameter(description = "端口信息", required = true)
-            @RequestBody PortUrl port) {
+            @RequestBody @Validated PortUrl port) {
         Objects.requireNonNull(port, "port不能为空");
         PortUrl createdPort = portService.createPort(port);
         return Result.success(createdPort);
@@ -106,9 +108,9 @@ public class PortController {
     /**
      * 更新端口
      *
-     * @param id   端口ID
+     * @param id 端口ID
      * @param port 端口信息
-     * @return Result<Void> 更新结果
+     * @return 更新结果
      */
     @Operation(summary = "更新端口", description = "根据ID更新端口URL配置")
     @ApiResponse(responseCode = "200", description = "更新成功")
@@ -117,7 +119,7 @@ public class PortController {
             @Parameter(description = "端口ID", required = true)
             @PathVariable Long id,
             @Parameter(description = "端口信息", required = true)
-            @RequestBody PortUrl port) {
+            @RequestBody @Validated PortUrl port) {
         Objects.requireNonNull(id, "id不能为空");
         Objects.requireNonNull(port, "port不能为空");
         portService.updatePort(id, port);
@@ -128,7 +130,7 @@ public class PortController {
      * 删除端口
      *
      * @param id 端口ID
-     * @return Result<Void> 删除结果
+     * @return 删除结果
      */
     @Operation(summary = "删除端口", description = "根据ID删除端口URL配置")
     @ApiResponse(responseCode = "200", description = "删除成功")

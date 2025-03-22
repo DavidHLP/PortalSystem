@@ -8,14 +8,19 @@ export interface PortUrl {
 }
 
 export interface QueryParams {
-  page: number
-  limit: number
+  pageNum: number
+  pageSize: number
   number?: string
 }
 
 export interface PortListResponse {
   items: PortUrl[]
   total: number
+  pageNum: number
+  pageSize: number
+  pages: number
+  hasNext: boolean
+  hasPrevious: boolean
 }
 
 /**

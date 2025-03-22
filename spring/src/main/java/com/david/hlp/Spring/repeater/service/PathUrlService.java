@@ -4,6 +4,7 @@ import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.repeater.entity.ProjectUrlRequest;
 import com.david.hlp.Spring.repeater.entity.Url;
 import com.david.hlp.Spring.common.baseinterface.BaseService;
+import java.util.List;
 
 /**
  * 路径URL服务接口
@@ -23,4 +24,26 @@ public interface PathUrlService extends BaseService<Url, Integer> {
      * @return 分页结果
      */
     PageInfo<ProjectUrlRequest> getProjectUrlRequestList(Integer page, Integer limit, Integer routerId, Integer hostId, Integer portId, Integer projectId, String method, Integer isActive, String protocol);
+    /**
+     * 获取分页结果
+     * @param page 页码
+     * @param limit 每页大小
+     * @param entity 查询条件
+     * @return 分页结果
+     */
+    PageInfo<ProjectUrlRequest> getPageUltra(Integer page, Integer limit, Url entity);
+
+    /**
+     * 根据项目ID获取URL列表
+     * @param projectId 项目ID
+     * @return URL列表
+     */
+    List<Url> getByProjectId(Integer projectId);
+
+    /**
+     * 根据URL ID获取URL列表
+     * @param urlId 用户ID
+     * @return URL列表
+     */
+    List<Url> getByListUrlId(List<Integer> urlIds);
 }

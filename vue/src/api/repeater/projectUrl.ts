@@ -9,13 +9,16 @@ export interface ProjectUrl {
   createdAt?: string | null
 }
 
+/**
+ * 分页查询项目URL列表
+ */
 export const getProjectUrlList = (
   pageNum: number,
   pageSize: number,
   params?: Partial<ProjectUrl>,
 ): Promise<PageInfo<ProjectUrl>> =>
   request({
-    url: `/api/repeater/project-url/findAll`,
+    url: `/api/repeater/project-url/list`,
     method: 'POST',
     data: {
       pageNum,
@@ -26,25 +29,55 @@ export const getProjectUrlList = (
     },
   })
 
-export const createProjectUrl = (data: ProjectUrl) =>
+/**
+ * 获取项目URL详情
+ */
+export const getProjectUrl = (id: number): Promise<ProjectUrl> =>
+  request({
+    url: `/api/repeater/project-url/get`,
+    method: 'POST',
+    data: {
+      id,
+    },
+  })
+
+/**
+ * 新增项目URL
+ */
+export const createProjectUrl = (data: ProjectUrl): Promise<void> =>
   request({
     url: `/api/repeater/project-url/add`,
     method: 'POST',
     data,
   })
 
-export const updateProjectUrl = (data: ProjectUrl) =>
+/**
+ * 更新项目URL
+ */
+export const updateProjectUrl = (data: ProjectUrl): Promise<void> =>
   request({
     url: `/api/repeater/project-url/update`,
     method: 'POST',
     data,
   })
 
-export const deleteProjectUrl = (id: number) =>
+/**
+ * 删除项目URL
+ */
+export const deleteProjectUrl = (id: number): Promise<void> =>
   request({
     url: `/api/repeater/project-url/delete`,
     method: 'POST',
     data: {
-      id: id,
+      id,
     },
+  })
+
+/**
+ * 获取所有项目URL
+ */
+export const getProjectUrlListAll = (): Promise<ProjectUrl[]> =>
+  request({
+    url: `/api/repeater/project-url/listAll`,
+    method: 'POST',
   })

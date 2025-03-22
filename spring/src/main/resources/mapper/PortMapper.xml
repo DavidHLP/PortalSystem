@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.david.hlp.Spring.repeater.mapper.PortMapper">
+    <resultMap id="BaseResultMap" type="com.david.hlp.Spring.repeater.entity.PortUrl">
+        <id column="id" property="id"/>
+        <result column="number" property="number"/>
+        <result column="description" property="description"/>
+    </resultMap>
+
+    <select id="listPorts" resultMap="BaseResultMap">
+        SELECT * FROM port_url
+        <where>
+            <if test="portNumber != null and portNumber != ''">
+                number LIKE CONCAT('%', #{portNumber}, '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="getPortCount" resultType="int">
+        SELECT COUNT(*) FROM port_url
+        <where>
+            <if test="portNumber != null and portNumber != ''">
+                number LIKE CONCAT('%', #{portNumber}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getPortById" resultMap="BaseResultMap">
+        SELECT * FROM port_url WHERE id = #{portId}
+    </select>
+
+    <select id="getPortByNumber" resultMap="BaseResultMap">
+        SELECT * FROM port_url WHERE number = #{portNumber}
+    </select>
+
+    <insert id="insertPort" parameterType="com.david.hlp.Spring.repeater.entity.PortUrl" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO port_url(number, description)
+        VALUES(#{number}, #{description})
+    </insert>
+
+    <update id="updatePort" parameterType="com.david.hlp.Spring.repeater.entity.PortUrl">
+        UPDATE port_url
+        SET number = #{number},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deletePort">
+        DELETE FROM port_url WHERE id = #{portId}
+    </delete>
+
+    <select id="getPortByIdWithAllFields" resultMap="BaseResultMap">
+        SELECT * FROM port_url WHERE id = #{portId}
+    </select>
+
+    <select id="listAllPorts" resultMap="BaseResultMap">
+        SELECT id, number FROM port_url
+    </select>
+
+    <select id="getPortByIdWithoutDescription" resultMap="BaseResultMap">
+        SELECT id, number FROM port_url WHERE id = #{portId}
+    </select>
+</mapper> 

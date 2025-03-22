@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.david.hlp.Spring.repeater.mapper.HostMapper">
+    <resultMap id="BaseResultMap" type="com.david.hlp.Spring.repeater.entity.HostUrl">
+        <id column="id" property="id"/>
+        <result column="address" property="address"/>
+        <result column="description" property="description"/>
+        <result column="is_active" property="isActive"/>
+    </resultMap>
+
+    <select id="listHosts" resultMap="BaseResultMap">
+        SELECT id, address, description, is_active FROM host_url
+        <where>
+            <if test="address != null">address LIKE CONCAT('%', #{address}, '%')</if>
+            <if test="isActive != null">AND is_active = #{isActive}</if>
+        </where>
+        <if test="limit != null">LIMIT #{limit}</if>
+        <if test="offset != null">OFFSET #{offset}</if>
+    </select>
+
+    <select id="listAllHosts" resultMap="BaseResultMap">
+        SELECT id, address, is_active FROM host_url
+    </select>
+
+    <select id="getHostById" resultMap="BaseResultMap">
+        SELECT id, address, description, is_active FROM host_url WHERE id = #{id}
+    </select>
+
+    <select id="getHostBasicInfoById" resultMap="BaseResultMap">
+        SELECT id, address, is_active FROM host_url WHERE id = #{id}
+    </select>
+
+    <insert id="insertHost" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO host_url(address, description, is_active)
+        VALUES(#{address}, #{description}, #{isActive})
+    </insert>
+
+    <update id="updateHost">
+        UPDATE host_url 
+        SET address = #{address}, 
+            description = #{description}, 
+            is_active = #{isActive} 
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteHostById">
+        DELETE FROM host_url WHERE id = #{id}
+    </delete>
+
+    <select id="checkHostAddressExists" resultType="int">
+        SELECT COUNT(1) FROM host_url WHERE address = #{address}
+    </select>
+
+    <select id="getHostCount" resultType="long">
+        SELECT COUNT(1) FROM host_url
+        <where>
+            <if test="address != null">address LIKE CONCAT('%', #{address}, '%')</if>
+            <if test="isActive != null">AND is_active = #{isActive}</if>
+        </where>
+    </select>
+</mapper> 

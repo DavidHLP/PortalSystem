@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 
 /**
  * 主机URL实体类
+ *
+ * @author david
+ * @date 2024/03/21
  */
 @Data
 @Builder
@@ -31,9 +34,8 @@ public class HostUrl {
      * 状态标识（true:启用 false:停用）
      */
     private Boolean isActive;
-    
     /**
      * 创建时间
      */
     private LocalDateTime createdAt;
-} 
+}

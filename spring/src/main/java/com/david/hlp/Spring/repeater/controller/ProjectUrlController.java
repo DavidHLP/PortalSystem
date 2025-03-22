@@ -11,9 +11,9 @@ import com.david.hlp.Spring.repeater.entity.ProjectUrl;
 import com.david.hlp.Spring.repeater.service.ProjectUrlService;
 import com.david.hlp.Spring.common.enums.ResultCode;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
+import org.springframework.validation.annotation.Validated;
+import java.util.List;
 /**
  * 项目URL控制器
  *
@@ -29,59 +29,94 @@ public class ProjectUrlController {
     private final ProjectUrlService projectUrlService;
 
     /**
-     * 分页查询所有项目URL
+     * 分页查询项目URL列表
      *
      * @param pageInfo 分页查询条件
      * @return 分页查询结果
      */
     @Operation(summary = "分页查询项目URL列表", description = "根据条件分页查询项目URL信息")
-    @PostMapping("/findAll")
-    public Result<PageInfo<ProjectUrl>> findAll(
-            @Parameter(description = "分页查询参数")
-            @RequestBody(required = false) PageInfo<ProjectUrl> pageInfo) {
+    @PostMapping("/list")
+    public Result<PageInfo<ProjectUrl>> list(@RequestBody(required = false) PageInfo<ProjectUrl> pageInfo) {
         if (pageInfo == null) {
             return Result.error(ResultCode.BAD_REQUEST);
         }
-        return Result.success(projectUrlService.getProjectUrlList(
-            pageInfo.getPageSize(),
+        return Result.success(projectUrlService.getPage(
             pageInfo.getPageNum(),
-            pageInfo.getQuery().getProjectName(),
-            pageInfo.getQuery().getProjectInterfaceName()));
+            pageInfo.getPageSize(),
+            pageInfo.getQuery()));
     }
 
     /**
-     * 删除项目URL
+     * 获取项目URL详情
      *
-     * @param projectUrl 待删除的项目URL
-     * @return 删除结果
+     * @param id 项目URL ID
+     * @return 项目URL详情
      */
-    @Operation(summary = "删除项目URL", description = "根据ID删除项目URL信息")
-    @PostMapping("/delete")
-    public Result<Void> delete(
-            @Parameter(description = "项目URL对象")
-            @RequestBody ProjectUrl projectUrl) {
+    @Operation(summary = "获取项目URL详情", description = "根据ID获取项目URL详细信息")
+    @PostMapping("/get")
+    public Result<ProjectUrl> get(@RequestBody ProjectUrl projectUrl) {
         if (projectUrl == null || projectUrl.getId() == null) {
             return Result.error(ResultCode.BAD_REQUEST);
         }
-        projectUrlService.removeProjectUrl(projectUrl);
-        return Result.success("删除成功");
+        return Result.success(projectUrlService.getById(projectUrl.getId()));
+    }
+
+    /**
+     * 新增项目URL
+     *
+     * @param projectUrl 项目URL信息
+     * @return 新增结果
+     */
+    @Operation(summary = "新增项目URL", description = "新增项目URL信息")
+    @PostMapping("/add")
+    public Result<Void> add(@Validated @RequestBody ProjectUrl projectUrl) {
+        if (projectUrl == null) {
+            return Result.error(ResultCode.BAD_REQUEST);
+        }
+        projectUrlService.create(projectUrl);
+        return Result.success();
     }
 
     /**
      * 更新项目URL
      *
-     * @param projectUrl 待更新的项目URL
+     * @param projectUrl 项目URL信息
      * @return 更新结果
      */
     @Operation(summary = "更新项目URL", description = "更新项目URL信息")
     @PostMapping("/update")
-    public Result<Void> update(
-            @Parameter(description = "项目URL对象")
-            @RequestBody ProjectUrl projectUrl) {
+    public Result<Void> update(@Validated @RequestBody ProjectUrl projectUrl) {
         if (projectUrl == null || projectUrl.getId() == null) {
             return Result.error(ResultCode.BAD_REQUEST);
         }
-        projectUrlService.updateProjectUrl(projectUrl);
-        return Result.success("更新成功");
+        projectUrlService.update(projectUrl);
+        return Result.success();
+    }
+
+    /**
+     * 删除项目URL
+     *
+     * @param projectUrl 项目URL信息
+     * @return 删除结果
+     */
+    @Operation(summary = "删除项目URL", description = "根据ID删除项目URL信息")
+    @PostMapping("/delete")
+    public Result<Void> delete(@RequestBody ProjectUrl projectUrl) {
+        if (projectUrl == null || projectUrl.getId() == null) {
+            return Result.error(ResultCode.BAD_REQUEST);
+        }
+        projectUrlService.deleteById(projectUrl.getId());
+        return Result.success();
+    }
+
+    /**
+     * 获取所有项目URL
+     *
+     * @return 所有项目URL列表
+     */
+    @Operation(summary = "获取所有项目URL", description = "获取所有项目URL列表")
+    @PostMapping("/listAll")
+    public Result<List<ProjectUrl>> listAll() {
+        return Result.success(projectUrlService.listAll());
     }
 }

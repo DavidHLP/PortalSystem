@@ -1,7 +1,7 @@
 package com.david.hlp.Spring.common.baseinterface;
 
 import com.david.hlp.Spring.common.result.PageInfo;
-
+import java.util.List;
 /**
  * 基础Service接口
  * @param <T> 实体类型
@@ -41,11 +41,11 @@ public interface BaseService<T, ID> {
      * @param limit 每页大小
      * @return 分页结果
      */
-    PageInfo<T> getPage(Integer page, Integer limit);
+    PageInfo<T> getPage(Integer page, Integer limit , T entity);
 
     /**
      * 获取所有实体列表
      * @return 实体列表
      */
-    PageInfo<T> listAll();
-} 
+    List<T> listAll();
+}

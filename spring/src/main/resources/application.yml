@@ -56,10 +56,10 @@ server:
 logging:
   level:
     org.springframework.boot.autoconfigure: OFF # 禁用自动配置日志
-    org.springframework: DEBUG # Spring 调试日志级别
-    com.david.hlp.Spring.auth.mapper: DEBUG
-    org.mybatis: DEBUG
-    com.david.hlp.Spring.system.mapper: TRACE
+    # org.springframework: DEBUG # Spring 调试日志级别
+    # com.david.hlp.Spring.auth.mapper: DEBUG
+    # org.mybatis: DEBUG
+    # com.david.hlp.Spring.system.mapper: TRACE
 
 # MyBatis-Plus 配置
 mybatis-plus:

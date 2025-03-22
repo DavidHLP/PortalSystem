@@ -24,6 +24,16 @@ public class BusinessException extends RuntimeException {
     }
 
     /**
+     * 使用ResultCode和自定义消息构造异常
+     */
+    public BusinessException(ResultCode resultCode, String message) {
+        super(message);
+        this.resultCode = resultCode;
+        this.code = resultCode.getCode();
+        this.message = message;
+    }
+
+    /**
      * 使用字符串消息构造异常
      * 默认使用BAD_REQUEST(400)状态码
      */

@@ -6,17 +6,31 @@ export interface RouterUrl {
   createdAt: string
 }
 
-// 获取所有路由URL
-export const getRouterUrls = () => {
-  return request({
+export interface PageParams {
+  page: number
+  limit: number
+  path?: string
+}
+
+export interface PageResult<T> {
+  items: T[]
+  pageNum: number
+  pageSize: number
+  total: number
+}
+
+// 获取路由URL列表(分页)
+export const getRouterUrls = (params: PageParams) => {
+  return request<PageResult<RouterUrl>>({
     url: '/api/repeater/router-urls',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
 // 添加路由URL
 export const addRouterUrl = (data: { path: string }) => {
-  return request({
+  return request<RouterUrl>({
     url: '/api/repeater/router-urls',
     method: 'post',
     data
@@ -25,7 +39,7 @@ export const addRouterUrl = (data: { path: string }) => {
 
 // 更新路由URL
 export const updateRouterUrl = (id: number, data: { path: string }) => {
-  return request({
+  return request<RouterUrl>({
     url: `/api/repeater/router-urls/${id}`,
     method: 'put',
     data
@@ -34,7 +48,7 @@ export const updateRouterUrl = (id: number, data: { path: string }) => {
 
 // 删除路由URL
 export const deleteRouterUrl = (id: number) => {
-  return request({
+  return request<void>({
     url: `/api/repeater/router-urls/${id}`,
     method: 'delete'
   })

@@ -49,4 +49,24 @@ public class PageInfo<T> {
      * 总页数
      */
     private Integer pages;
+
+    /**
+     * 是否有下一页
+     */
+    private Boolean hasNext;
+
+    /**
+     * 是否有上一页
+     */
+    private Boolean hasPrevious;
+
+    /**
+     * 是否为第一页
+     */
+    private Boolean isFirst;
+
+    /**
+     * 是否为最后一页
+     */
+    private Boolean isLast;
 }

@@ -150,9 +150,9 @@
           background
         />
       </div>
-
-      <!-- 新增/编辑抽屉 -->
-      <el-drawer
+    </el-card>
+    <!-- 新增/编辑抽屉 -->
+    <el-drawer
         v-model="drawerVisible"
         :title="isEdit ? '编辑项目' : '添加项目'"
         direction="rtl"
@@ -256,7 +256,6 @@
           </div>
         </template>
       </el-drawer>
-    </el-card>
   </div>
 </template>
 

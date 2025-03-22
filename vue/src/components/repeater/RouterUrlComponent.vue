@@ -218,15 +218,14 @@ const total = ref(0)
 const fetchData = async () => {
   loading.value = true
   try {
-    // 这里假设API支持分页和搜索，实际开发中需要根据后端API调整
     const params = {
       page: currentPage.value,
       limit: pageSize.value,
       path: searchForm.path || undefined
     }
     const response = await getRouterUrls(params)
-    routerUrls.value = response.items || response // 兼容不同返回格式
-    total.value = response.total || response.length // 兼容不同返回格式
+    routerUrls.value = response.items
+    total.value = response.total
   } catch (error) {
     console.error('获取路由列表失败:', error)
     ElMessage.error('获取数据失败')

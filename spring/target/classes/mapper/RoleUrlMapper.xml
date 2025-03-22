@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.david.hlp.Spring.repeater.mapper.RoleUrlMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.david.hlp.Spring.repeater.entity.RoleUrl">
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="description" property="description"/>
+    </resultMap>
+
+    <!-- 包含项目信息的角色URL结果映射 -->
+    <resultMap id="RoleUrlWithProjectMap" type="com.david.hlp.Spring.repeater.entity.RoleUrl" extends="BaseResultMap">
+        <association property="project" javaType="com.david.hlp.Spring.repeater.entity.ProjectUrl">
+            <id column="project_id" property="id"/>
+            <result column="project_name" property="projectName"/>
+            <result column="project_description" property="description"/>
+            <result column="project_interface_name" property="projectInterfaceName"/>
+        </association>
+    </resultMap>
+
+    <!-- 获取所有角色URL及其关联的项目信息 -->
+    <select id="listAll" resultMap="RoleUrlWithProjectMap">
+        SELECT
+            r.*,
+            p.project_name,
+            p.description as project_description,
+            p.project_interface_name
+        FROM role_url r
+        LEFT JOIN project_url p ON p.id = r.project_id
+        <where>
+            <if test="entity != null">
+                <if test="entity.roleName != null and entity.roleName != ''">
+                    AND r.role_name LIKE CONCAT('%', #{entity.roleName}, '%')
+                </if>
+            </if>
+        </where>
+        ORDER BY r.id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 获取总记录数 -->
+    <select id="getTotalCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM role_url r
+        <where>
+            <if test="entity != null">
+                <if test="entity.roleName != null and entity.roleName != ''">
+                    AND r.role_name LIKE CONCAT('%', #{entity.roleName}, '%')
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据ID删除角色URL -->
+    <delete id="deleteById">
+        DELETE FROM role_url WHERE id = #{id}
+    </delete>
+
+    <!-- 更新角色URL -->
+    <update id="updateById" parameterType="com.david.hlp.Spring.repeater.entity.RoleUrl">
+        UPDATE role_url
+        <set>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="roleName != null and roleName != ''">role_name = #{roleName},</if>
+            <if test="description != null and description != ''">description = #{description},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateByIdAndDescription" parameterType="com.david.hlp.Spring.repeater.entity.RoleUrl">
+        UPDATE role_url
+            SET description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 插入角色URL -->
+    <insert id="insert" parameterType="com.david.hlp.Spring.repeater.entity.RoleUrl" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO role_url (project_id, role_name, description)
+        VALUES (#{projectId}, #{roleName}, #{description})
+    </insert>
+
+    <resultMap id="RoleUrlUrlMap" type="com.david.hlp.Spring.repeater.entity.RoleUrlUrl">
+        <id column="id" property="id"/>
+        <result column="role_id" property="roleId"/>
+        <result column="url_id" property="urlId"/>
+    </resultMap>
+    <!-- getRoleUrlListByRoleId -->
+    <select id="getRoleUrlListByRoleId" parameterType="java.lang.Integer">
+        SELECT
+            ruu.url_id as url_id
+        FROM role_url_url ruu
+        LEFT JOIN role_url ru ON ru.id = ruu.role_id
+        LEFT JOIN url u ON u.id = ruu.url_id
+        WHERE ruu.role_id = #{roleId}
+    </select>
+</mapper>
