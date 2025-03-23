@@ -47,8 +47,12 @@ import { useRoute } from 'vue-router'
 import SidebarMenuLinks from '@/components/SidebarMenuLinks.vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { useRouterStore } from '@/stores/router/routerStore'
+import type { Permissions } from '@/api/auth/auth.d'
+import { useUserStore } from '@/stores/user/userStore'
+import { filterRoutes } from '@/router/index'
 
 const route = useRoute()
+const permissions: Permissions[] = useUserStore().permissions
 const isCollapse = ref(false)
 
 const filteredLinks = ref<RouteRecordRaw[]>([])
@@ -56,15 +60,12 @@ const filteredLinks = ref<RouteRecordRaw[]>([])
 // 递归过滤隐藏的路由
 const filterHiddenRoutes = (routes: RouteRecordRaw[]): RouteRecordRaw[] => {
   let result: RouteRecordRaw[] = [];
-
   routes.forEach(route => {
     // 处理子路由
     let filteredChildren: RouteRecordRaw[] = [];
     if (route.children && route.children.length > 0) {
       filteredChildren = filterHiddenRoutes(route.children);
     }
-
-    // 如果当前路由不隐藏，直接添加（保留过滤后的子路由）
     if (!route.meta?.hidden && !route.meta?.metaHidden) {
       const routeCopy = { ...route };
       if (filteredChildren.length > 0) {
@@ -77,15 +78,16 @@ const filterHiddenRoutes = (routes: RouteRecordRaw[]): RouteRecordRaw[] => {
       result = result.concat(filteredChildren);
     }
   });
-
   return result;
 }
 
-onMounted(() => {
+onMounted(async () => {
   const routerStore = useRouterStore()
   // 获取路由并过滤隐藏的路由
-  const routes = routerStore.routes
-  filteredLinks.value = filterHiddenRoutes([...routes])
+  const routes = await routerStore.fetchRoutes()
+  const result = filterRoutes(routes , permissions)
+  const filteredRoutes = filterHiddenRoutes([...result])
+  filteredLinks.value = filteredRoutes
 })
 
 const breadcrumbList = computed(() => {

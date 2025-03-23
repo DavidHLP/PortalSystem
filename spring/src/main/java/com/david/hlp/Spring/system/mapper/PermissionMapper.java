@@ -11,8 +11,8 @@ import org.apache.ibatis.annotations.Delete;
 
 @Mapper
 public interface PermissionMapper extends BaseMapper<Permission> {
-    
-    @Select("SELECT permission FROM router WHERE role_id = #{roleId} AND status = 1 AND permission IS NOT NULL")
+
+    @Select("SELECT permission FROM permission LEFT JOIN role_permission ON role_permission.permission_id = permission.id WHERE role_id = #{roleId}")
     List<String> listPermissionNamesByRoleId(Long roleId);
 
     @Select("SELECT CASE WHEN COUNT(1) > 0 THEN true ELSE false END FROM permission WHERE permission = #{permission}")

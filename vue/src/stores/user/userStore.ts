@@ -8,14 +8,14 @@ export const useUserStore = defineStore('user', {
     userId: null as number | null,
     username: null as string | null,
     email: null as string | null,
-    permissions: [] as Permissions,
+    permissions: [] as Permissions[],
     role: null as Role | null,
     routes: [] as Router[],
   }),
   actions: {
     async getUserPermissions() {
       try {
-        const res: Permissions = await getUserPrivateInformation()
+        const res: Array<Permissions> = await getUserPrivateInformation()
         this.permissions = res
       } catch (error) {
         localStorage.removeItem('token')

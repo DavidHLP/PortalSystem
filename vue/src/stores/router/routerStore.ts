@@ -21,6 +21,9 @@ export const useRouterStore = defineStore('router', {
 
         if (this.routes.length === 0) {
           const backendRoutes = await getUserRoutes()
+          backendRoutes.forEach((route) => {
+            route.meta.permission = route.permission
+          })
           this.setRoutes(backendRoutes)
           // 缓存到本地存储
           localStorage.setItem('cachedRoutes', JSON.stringify(backendRoutes))

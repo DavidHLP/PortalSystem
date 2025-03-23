@@ -8,7 +8,7 @@ export const login = (data: { email: string; password: string }): Promise<Token>
     data: { ...data },
   })
 
-export const getUserPrivateInformation = (): Promise<Permissions> =>
+export const getUserPrivateInformation = (): Promise<Array<Permissions>> =>
   request({
     url: '/api/auth/demo/getUserPrivateInformation',
     method: 'GET',

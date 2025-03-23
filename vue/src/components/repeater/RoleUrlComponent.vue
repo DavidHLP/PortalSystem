@@ -232,7 +232,7 @@ import {
 } from '@/api/repeater/roleurl'
 import type { RoleUrl } from '@/types/repeater/roleurl'
 import type { PageInfo } from '@/utils/types/common'
-import { getProjectUrlListAll } from '@/api/repeater/projecturl'
+import { listAll } from '@/api/repeater/projecturl'
 import type { ProjectUrl } from '@/api/repeater/projecturl'
 import RoleUrlTreeComponent from './RoleUrlTreeComponent.vue'
 import MdEditorElement from '@/components/markdown/MdEditorElement.vue'
@@ -268,7 +268,7 @@ const rules = {
 
 const projectOptions = ref<ProjectUrl[]>([])
 const loadProjectOptions = async () => {
-  const data:ProjectUrl[] = await getProjectUrlListAll()
+  const data:ProjectUrl[] = await listAll()
   projectOptions.value = data
 }
 

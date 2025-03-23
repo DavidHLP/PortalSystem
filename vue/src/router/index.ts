@@ -2,7 +2,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/stores/user/userStore'
 import { useRouterStore } from '@/stores/router/routerStore'
 import type { Router } from '@/router/index.d'
-
+import type { Permissions } from '@/api/auth/auth.d'
 // 添加token过期时间检查
 const TOKEN_EXPIRE_TIME = 24 * 60 * 60 * 1000 // 24小时
 const TOKEN_CHECK_INTERVAL = 5 * 60 * 1000 // 5分钟检查一次
@@ -56,6 +56,7 @@ export function transformRoutes(backendRoutes: Router[]): RouteRecordRaw[] {
       redirect: route.redirect || undefined,
       meta: {
         ...route.meta,
+        permission: route.permission
       },
       children: route.children && route.children.length > 0
         ? transformRoutes(route.children)
@@ -85,14 +86,9 @@ export const setupAsyncRoutes = async () => {
   try {
     const dynamicRoutes = await routerStore.fetchRoutes()
     const userStore = useUserStore()
-    // 将permissions转换为数组格式
-    const permissionsArray = Array.isArray(userStore.permissions)
-      ? userStore.permissions
-      : Object.values(userStore.permissions || {})
 
     // 根据用户权限过滤路由
-    const filteredRoutes = filterRoutes(dynamicRoutes, permissionsArray)
-
+    const filteredRoutes = filterRoutes(dynamicRoutes, userStore.permissions)
     // 添加路由
     addRoutes(filteredRoutes)
     return filteredRoutes
@@ -175,9 +171,7 @@ router.beforeEach(async (to, from, next) => {
 
     try {
       // 将permissions转换为数组格式
-      const permissionsArray = Array.isArray(userStore.permissions)
-        ? userStore.permissions
-        : Object.values(userStore.permissions || {})
+      const permissionsArray = userStore.permissions
 
       // 如果权限列表为空，获取用户权限并加载动态路由
       if (!permissionsArray.length) {
@@ -191,8 +185,8 @@ router.beforeEach(async (to, from, next) => {
 
       // 验证当前路由权限
       if (
-        to.meta.permissions &&
-        !hasPermission(permissionsArray, to.meta.permissions as string[])
+        to.meta.permission &&
+        !hasPermission(permissionsArray, to.meta.permission as Permissions)
       ) {
         next('/403')
         return
@@ -233,13 +227,13 @@ export const startPermissionMonitor = () => {
 }
 
 // 更新路由过滤方法，支持递归处理子路由
-function filterRoutes(routes: RouteRecordRaw[], permissions: string[]): RouteRecordRaw[] {
+export function filterRoutes(routes: RouteRecordRaw[], permissions: Permissions[]): RouteRecordRaw[] {
   return routes.filter((route) => {
     let hasAuth = true
 
     // 检查当前路由是否需要权限验证
-    if (route.meta?.permissions) {
-      hasAuth = hasPermission(permissions, route.meta.permissions as string[])
+    if (route.meta?.permission) {
+      hasAuth = hasPermission(permissions, route.meta.permission as Permissions)
     }
 
     // 如果当前路由有权限访问且有子路由，递归过滤子路由
@@ -252,12 +246,12 @@ function filterRoutes(routes: RouteRecordRaw[], permissions: string[]): RouteRec
 }
 
 // 更新权限验证方法，支持多种权限验证模式
-function hasPermission(userPermissions: string[], requiredPermissions: string[]): boolean {
-  if (!requiredPermissions || requiredPermissions.length === 0) return true
-  if (!userPermissions || userPermissions.length === 0) return false
+function hasPermission(userPermissions: Permissions[], requiredPermissions: Permissions): boolean {
+  if (!requiredPermissions) return true
+  if (!userPermissions) return false
 
   // 只要有一个权限符合即可访问
-  return requiredPermissions.some((permission) => userPermissions.includes(permission))
+  return userPermissions.includes(requiredPermissions)
 }
 
 export default router

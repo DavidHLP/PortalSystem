@@ -337,6 +337,7 @@ const handleConfirmEdit = async () => {
     }
 
     ElMessage.success('用户信息更新成功')
+    await fetchData(pageNum.value, pageSize.value)
     editDialogVisible.value = false
   } catch (error) {
     console.error('更新失败:', error)

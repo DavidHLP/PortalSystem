@@ -15,8 +15,9 @@ export interface BackendRoute {
 }
 
 // 新架构接口
-
+import type { Permissions } from '@/api/auth/auth.d'
 export interface Meta {
+  permission?: Permissions
   lwaysShow: boolean;
   component: string;
   hidden: boolean;
@@ -38,7 +39,7 @@ export interface Router {
   meta: Meta;
   name: string;
   path: string;
-  permission: string;
+  permission: Permissions;
   pid: null;
   remark: string;
   status: number;
