@@ -5,7 +5,8 @@ import com.baomidou.mybatisplus.annotation.IEnum;
 public enum TokenType implements IEnum<String> {
     BEARER("BEARER"),
     ACCESS("ACCESS"),
-    REFRESH("REFRESH");
+    REFRESH("REFRESH"),
+    PASS("PASS");
     @EnumValue
     private final String value;
 

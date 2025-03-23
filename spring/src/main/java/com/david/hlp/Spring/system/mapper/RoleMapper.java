@@ -16,7 +16,7 @@ import com.david.hlp.Spring.system.entity.role.RolePermission;
  */
 @Mapper
 public interface RoleMapper extends BaseMapper<Role> {
-    
+
     /**
      * 根据角色ID获取角色信息
      * @param roleId 角色ID

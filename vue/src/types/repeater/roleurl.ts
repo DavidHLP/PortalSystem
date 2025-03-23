@@ -1,7 +1,7 @@
-import type { HostUrl } from './host_url'
-import type { PortUrl } from './porturl'
-import type { RouterUrl } from './routerurl'
-import type { ProjectUrl } from './projectUrl'
+import type { HostUrl } from '@/api/repeater/hosturl'
+import type { PortUrl } from '@/api/repeater/porturl'
+import type { RouterUrl } from '@/api/repeater/routerurl'
+import type { ProjectUrl } from '@/api/repeater/projecturl'
 
 export interface RoleUrl {
   id?: number

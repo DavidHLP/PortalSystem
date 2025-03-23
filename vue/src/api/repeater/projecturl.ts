@@ -76,7 +76,7 @@ export const deleteProjectUrl = (id: number): Promise<void> =>
 /**
  * 获取所有项目URL
  */
-export const getProjectUrlListAll = (): Promise<ProjectUrl[]> =>
+export const listAll = (): Promise<ProjectUrl[]> =>
   request({
     url: `/api/repeater/project-url/listAll`,
     method: 'POST',

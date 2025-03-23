@@ -21,7 +21,7 @@ public interface RoleUrlMapper extends BaseMapper<RoleUrl> {
      * @param offset 偏移量
      * @return 角色URL列表，包含项目信息
      */
-    List<RoleUrl> listAll(@Param("entity") RoleUrl entity,
+    List<RoleUrl> getPage(@Param("entity") RoleUrl entity,
                                           @Param("pageSize") Integer pageSize,
                                           @Param("offset") Integer offset);
 
@@ -72,5 +72,12 @@ public interface RoleUrlMapper extends BaseMapper<RoleUrl> {
      * @return 角色URL列表
      */
     List<Integer> getRoleUrlListByRoleId(@Param("roleId") Integer roleId);
+
+    /**
+     * 获取所有角色URL
+     *
+     * @return 角色URL列表
+     */
+    List<RoleUrl> listAll();
 }
 

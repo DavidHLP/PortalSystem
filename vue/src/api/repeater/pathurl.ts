@@ -1,8 +1,8 @@
 import request from '@/utils/request/request'
-import type { ProjectUrl } from '@/api/repeater/projectUrl'
+import type { ProjectUrl } from '@/api/repeater/projecturl'
 import type { RouterUrl } from './routerurl'
 import type { PortUrl } from './porturl'
-import type { HostUrl } from './host_url'
+import type { HostUrl } from './hosturl'
 import type { PageInfo } from '@/utils/types/common'
 
 export interface GroupedProject {

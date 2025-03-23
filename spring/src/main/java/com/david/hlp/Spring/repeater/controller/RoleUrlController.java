@@ -59,4 +59,9 @@ public class RoleUrlController {
         roleUrlService.deleteRoleUrl(roleId, urlId);
         return Result.success();
     }
+
+    @GetMapping("/listAll")
+    public Result<List<RoleUrl>> listAll() {
+        return Result.success(roleUrlService.listAll());
+    }
 }

@@ -79,3 +79,10 @@ export const updateUserRole = (data: { userId: number; roleId: number }): Promis
     method: 'POST',
     data,
   })
+
+export const register = (data: { name: string; email: string; password: string }): Promise<void> =>
+  request({
+    url: '/api/auth/demo/register',
+    method: 'post',
+    data: { ...data },
+  })

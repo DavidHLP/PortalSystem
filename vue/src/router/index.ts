@@ -22,6 +22,15 @@ const baseRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/front/login/LoginView.vue'),
   },
   {
+    path: '/register',
+    name: 'register',
+    component: () => import('@/views/front/register/RegisterView.vue'),
+    meta: {
+      title: '注册',
+      requiresAuth: false
+    }
+  },
+  {
     path: '/about',
     name: 'about',
     meta: { type: 'M' },

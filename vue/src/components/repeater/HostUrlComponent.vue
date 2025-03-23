@@ -261,7 +261,7 @@ import {
   updateHostStatus,
   type HostUrl,
   type QueryParams,
-} from '@/api/repeater/host_url'
+} from '@/api/repeater/hosturl'
 import MdEditorElement from '@/components/markdown/MdEditorElement.vue'
 import MarkdownView from '@/components/markdown/MarkdownView.vue'
 

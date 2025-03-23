@@ -34,7 +34,7 @@ export const getRoleUrlListByRoleId = (roleId: number):Promise<RoleUrl[]> => {
   })
 }
 
-export const batchAddUrls = (roleId: number, urlIds: number[]) => {
+export const batchAddUrls = (roleId: number, urlIds: number[]): Promise<void> => {
   return request({
     url: `/api/repeater/roleurl/batchAddUrls?roleId=${roleId}`,
     method: 'post',
@@ -42,9 +42,16 @@ export const batchAddUrls = (roleId: number, urlIds: number[]) => {
   })
 }
 
-export const deleteRoleUrlRelation = (roleId: number, urlId: number) => {
+export const deleteRoleUrlRelation = (roleId: number, urlId: number): Promise<void> => {
   return request({
     url: `/api/repeater/roleurl/deleteRoleUrl?roleId=${roleId}&urlId=${urlId}`,
     method: 'delete'
+  })
+}
+
+export const listAll = (): Promise<RoleUrl[]> => {
+  return request({
+    url: '/api/repeater/roleurl/listAll',
+    method: 'get'
   })
 }

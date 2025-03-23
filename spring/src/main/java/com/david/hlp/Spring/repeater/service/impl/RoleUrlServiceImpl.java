@@ -36,7 +36,7 @@ public class RoleUrlServiceImpl implements RoleUrlService {
 
     @Override
     public List<RoleUrl> listAll() {
-        return null;
+        return roleUrlMapper.listAll();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class RoleUrlServiceImpl implements RoleUrlService {
          // 获取总记录数
          Integer total = roleUrlMapper.getTotalCount(entity);
          // 获取分页数据
-         List<RoleUrl> list = roleUrlMapper.listAll(entity, limit, offset);
+         List<RoleUrl> list = roleUrlMapper.getPage(entity, limit, offset);
 
          // 构建分页结果
          return PageInfo.<RoleUrl>builder()

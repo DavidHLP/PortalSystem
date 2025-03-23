@@ -29,11 +29,13 @@ public interface UserMapper extends BaseMapper<User> {
     List<String> listAuthoritiesByRoleId(Long roleId);
 
     @Select("SELECT `id`, `name`, `email`, `password`, `status`, `role_id` as roleId " +
-            "FROM `user` WHERE `name` = #{username} AND `status`= 1")
+            "FROM `user` WHERE `name` = #{username} AND `status` = 1")
     AuthUser getByUsername(String username);
 
-    @Insert("INSERT INTO `user` (`name`, `email`, `password`, `status`, `role_id`, `gmt_create`, `gmt_modified`) " +
-            "VALUES(#{name}, #{email}, #{password}, #{status}, #{roleId}, NOW(), NOW())")
+    @Insert("INSERT INTO `user` (`name`, `email`, `password`, `status`, `role_id`, `avatar`, " +
+            "`introduction`, `address`, `create_time`) " +
+            "VALUES(#{name}, #{email}, #{password}, #{status}, #{roleId}, #{avatar}, " +
+            "#{introduction}, #{address}, NOW())")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(User user);
 
@@ -59,23 +61,25 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Select("<script>" +
             "SELECT u.`id`, u.`name`, u.`email`, u.`status`, u.`role_id`, u.`avatar`, " +
-            "r.`role_name`, u.`address`, u.`create_time` " +
+            "r.`role_name`, u.`address`, u.`introduction`, u.`last_login_ip`, " +
+            "u.`last_login`, u.`create_time` " +
             "FROM `user` u " +
             "LEFT JOIN `role` r ON u.`role_id` = r.`id` " +
             "<where> " +
-            "<if test='query.status != null'>AND u.`status`= #{query.status} </if> " +
+            "<if test='query.status != null'>AND u.`status` = #{query.status} </if> " +
             "<if test='query.roleId != null'>AND u.`role_id` = #{query.roleId} </if> " +
             "<if test='query.name != null'>AND u.`name` LIKE CONCAT('%', #{query.name}, '%') </if> " +
             "</where> " +
+            "ORDER BY u.`create_time` DESC " +
             "LIMIT #{pageNum}, #{pageSize}" +
             "</script>")
     List<User> listByPage(@Param("pageNum") int pageNum, @Param("pageSize") int pageSize, @Param("query") User query);
 
     @Select("<script>" +
-            "SELECT COUNT(u.`id`) " +
+            "SELECT COUNT(1) " +
             "FROM `user` u " +
             "<where> " +
-            "<if test='query.status != null'>AND u.`status`= #{query.status} </if> " +
+            "<if test='query.status != null'>AND u.`status` = #{query.status} </if> " +
             "<if test='query.roleId != null'>AND u.`role_id` = #{query.roleId} </if> " +
             "<if test='query.name != null'>AND u.`name` LIKE CONCAT('%', #{query.name}, '%') </if> " +
             "</where>" +
@@ -98,7 +102,8 @@ public interface UserMapper extends BaseMapper<User> {
             "<if test='user.address != null'>`address` = #{user.address}, </if> " +
             "<if test='user.introduction != null'>`introduction` = #{user.introduction}, </if> " +
             "<if test='user.avatar != null'>`avatar` = #{user.avatar}, </if> " +
-            "`gmt_modified` = NOW() " +
+            "<if test='user.lastLoginIp != null'>`last_login_ip` = #{user.lastLoginIp}, </if> " +
+            "<if test='user.lastLogin != null'>`last_login` = #{user.lastLogin}, </if> " +
             "</set> " +
             "WHERE `id` = #{user.id}" +
             "</script>")

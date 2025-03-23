@@ -263,7 +263,7 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance } from 'element-plus'
-import { getProjectUrlList, createProjectUrl, updateProjectUrl, deleteProjectUrl, type ProjectUrl } from '@/api/repeater/projectUrl'
+import { getProjectUrlList, createProjectUrl, updateProjectUrl, deleteProjectUrl, type ProjectUrl } from '@/api/repeater/projecturl'
 import 'md-editor-v3/lib/style.css'
 import MdEditorElement from '@/components/markdown/MdEditorElement.vue'
 import MarkdownView from '@/components/markdown/MarkdownView.vue'
