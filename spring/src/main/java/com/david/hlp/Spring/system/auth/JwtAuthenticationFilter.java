@@ -17,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.beans.factory.annotation.Qualifier;
 /**
  * JWT 认证过滤器。
  *
@@ -32,7 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
 
   // 用于加载用户详细信息
+  @Qualifier("userDetailsServiceImp")
   private final UserDetailsService userDetailsService;
+
+  @Qualifier("repeaterUserDetailsServiceImp")
+  private final UserDetailsService repeaterUserDetailsService;
 
   // 用于检查 JWT 是否在数据库中有效
   private final TokenMapper tokenMapper;
@@ -43,6 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     "/api/auth/demo/register",
     "/api/auth/demo/logout",
     "/api/auth/demo/refresh-token",
+    "/api/repeater/auth/login",
     "/swagger-ui/**",
     "/doc.html",
     "/doc.html/**",
@@ -99,6 +104,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 5. 处理正常的带token请求
     final String jwt = authHeader.substring(7);
     final String userEmail = jwtService.extractUsername(jwt);
+
+    if (path.startsWith("/api/repeater/auth/")) {
+      // 验证用户并设置认证信息
+      UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+      // 检查 JWT 是否在数据库中有效，且未过期或撤销
+      var isTokenValid = tokenMapper.checkTokenValid(jwt);
+      // 验证 JWT 是否有效
+      if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
+        // 直接从UserDetails获取权限
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+
+        // 设置认证请求的详细信息
+        authToken.setDetails(
+                new WebAuthenticationDetailsSource().buildDetails(request)
+        );
+
+        // 确保在认证成功后设置SecurityContext
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+      }
+    }
 
     // 验证用户并设置认证信息
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

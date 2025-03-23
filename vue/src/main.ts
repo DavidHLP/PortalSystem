@@ -12,7 +12,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from './router'
 import { useUserStore } from '@/stores/user/userStore'
-import { setupAsyncRoutes, startPermissionMonitor } from '@/router'
+import { setupAsyncRoutes, startPermissionMonitor, hasPermission } from '@/router'
 
 const app = createApp(App)
 
@@ -32,6 +32,9 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.use(ElementPlus, {
   locale: zhCn, // 一定要加上，不然无效
 })
+
+// 全局注册hasPermission方法
+app.config.globalProperties.$hasPermission = hasPermission
 
 router.isReady().then(async () => {
   window.addEventListener('unauthorized', () => {

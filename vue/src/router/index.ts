@@ -246,7 +246,7 @@ export function filterRoutes(routes: RouteRecordRaw[], permissions: Permissions[
 }
 
 // 更新权限验证方法，支持多种权限验证模式
-function hasPermission(userPermissions: Permissions[], requiredPermissions: Permissions): boolean {
+export function hasPermission(userPermissions: Permissions[], requiredPermissions: Permissions): boolean {
   if (!requiredPermissions) return true
   if (!userPermissions) return false
 

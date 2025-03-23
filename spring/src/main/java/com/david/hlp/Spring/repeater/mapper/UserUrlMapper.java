@@ -12,7 +12,7 @@ public interface UserUrlMapper {
      * @param userUrl 用户URL对象
      * @return 插入后的用户URL对象
      */
-    UserUrl insert(UserUrl userUrl);
+    void insert(UserUrl userUrl);
 
     /**
      * 根据ID查询用户URL
@@ -56,4 +56,11 @@ public interface UserUrlMapper {
      * @return 用户URL列表
      */
     List<UserUrl> listAll();
+
+    /**
+     * 根据邮箱查询用户URL
+     * @param email 邮箱
+     * @return 用户URL对象
+     */
+    UserUrl getByEmail(String email);
 }

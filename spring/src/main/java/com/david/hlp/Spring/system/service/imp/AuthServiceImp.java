@@ -17,7 +17,7 @@ import com.david.hlp.Spring.common.exception.BusinessException;
 import com.david.hlp.Spring.system.entity.auth.AuthUser;
 import com.david.hlp.Spring.system.token.TokenType;
 import com.david.hlp.Spring.system.mapper.TokenMapper;
-
+import com.david.hlp.Spring.system.service.AuthService;
 /**
  * 认证服务实现类
  *
@@ -25,7 +25,7 @@ import com.david.hlp.Spring.system.mapper.TokenMapper;
  */
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImp {
+public class AuthServiceImp implements AuthService<LoginDTO, RegistrationDTO , Token> {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -39,8 +39,9 @@ public class AuthServiceImp {
      * @param request 注册请求对象
      * @throws BusinessException 当用户已存在时抛出异常
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
-    public void demoAddUser(RegistrationDTO request) {
+    public void addUser(RegistrationDTO request) {
         if (userMapper.getByEmailToUser(request.getEmail()) != null) {
             throw new BusinessException(ResultCode.USER_EXISTS);
         }
@@ -63,6 +64,7 @@ public class AuthServiceImp {
      * @return Token 登录成功后的令牌
      * @throws BusinessException 当用户不存在或密码错误时抛出异常
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Token login(LoginDTO request) {
         AuthUser user = userMapper.getByEmailToAuthUser(request.getEmail());
@@ -90,7 +92,8 @@ public class AuthServiceImp {
      *
      * @return 默认角色ID
      */
-    private Long getDefaultRoleId() {
+    @Override
+    public Long getDefaultRoleId() {
         return roleMapper.getDefaultRoleId();
     }
 
@@ -100,6 +103,7 @@ public class AuthServiceImp {
      * @param userId 用户ID
      * @return 用户密码
      */
+    @Override
     public String getPassword(Long userId) {
         return userMapper.getPasswordById(userId);
     }

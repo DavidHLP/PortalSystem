@@ -1,17 +1,19 @@
 package com.david.hlp.Spring.repeater.controller;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.david.hlp.Spring.repeater.entity.UserUrl;
+import com.david.hlp.Spring.repeater.entity.TokenUrl;
 import com.david.hlp.Spring.repeater.service.UserUrlService;
 import com.david.hlp.Spring.common.result.Result;
 import com.david.hlp.Spring.common.result.PageInfo;
-
+import com.david.hlp.Spring.system.service.AuthService;
+import com.david.hlp.Spring.system.entity.auth.LoginDTO;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 
 @Slf4j
 @RestController
@@ -19,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserUrlController {
     private final UserUrlService userUrlService;
+    @Qualifier("repeaterAuthServiceImp")
+    private final AuthService<LoginDTO,UserUrl,TokenUrl> authService;
 
     /**
      * 获取所有用户URL
@@ -26,10 +30,10 @@ public class UserUrlController {
      * @return 用户URL列表
      */
     @GetMapping
-    public ResponseEntity<Result<List<UserUrl>>> listAll() {
+    public Result<List<UserUrl>> listAll() {
         log.info("获取所有用户URL");
         List<UserUrl> userUrls = userUrlService.listAll();
-        return ResponseEntity.ok(Result.success(userUrls));
+        return Result.success(userUrls);
     }
 
     /**
@@ -39,10 +43,10 @@ public class UserUrlController {
      * @return 用户URL信息
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Result<UserUrl>> getById(@PathVariable Integer id) {
+    public Result<UserUrl> getById(@PathVariable Integer id) {
         log.info("获取用户URL, id: {}", id);
         UserUrl userUrl = userUrlService.getById(id);
-        return ResponseEntity.ok(Result.success(userUrl));
+        return Result.success(userUrl);
     }
 
     /**
@@ -52,10 +56,10 @@ public class UserUrlController {
      * @return 创建后的用户URL信息
      */
     @PostMapping
-    public ResponseEntity<Result<UserUrl>> create(@RequestBody UserUrl userUrl) {
+    public Result<UserUrl> create(@RequestBody UserUrl userUrl) {
         log.info("创建用户URL: {}", userUrl);
-        UserUrl createdUserUrl = userUrlService.create(userUrl);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Result.success(createdUserUrl));
+        authService.addUser(userUrl);
+        return Result.success("创建成功");
     }
 
     /**
@@ -66,11 +70,11 @@ public class UserUrlController {
      * @return 更新后的用户URL信息
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Result<UserUrl>> update(@PathVariable Integer id, @RequestBody UserUrl userUrl) {
+    public Result<UserUrl> update(@PathVariable Integer id, @RequestBody UserUrl userUrl) {
         log.info("更新用户URL, id: {}, userUrl: {}", id, userUrl);
         userUrl.setId(id);
         UserUrl updatedUserUrl = userUrlService.update(userUrl);
-        return ResponseEntity.ok(Result.success(updatedUserUrl));
+        return Result.success(updatedUserUrl);
     }
 
     /**
@@ -80,10 +84,10 @@ public class UserUrlController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Result<Void>> delete(@PathVariable Integer id) {
+    public Result<Void> delete(@PathVariable Integer id) {
         log.info("删除用户URL, id: {}", id);
         userUrlService.deleteById(id);
-        return ResponseEntity.ok(Result.success("删除成功"));
+        return Result.success("删除成功");
     }
 
     /**
@@ -95,12 +99,12 @@ public class UserUrlController {
      * @return 分页查询结果
      */
     @GetMapping("/page")
-    public ResponseEntity<Result<PageInfo<UserUrl>>> getPage(
+    public Result<PageInfo<UserUrl>> getPage(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer limit,
             UserUrl userUrl) {
         log.info("分页查询用户URL, page: {}, limit: {}, condition: {}", page, limit, userUrl);
         PageInfo<UserUrl> pageInfo = userUrlService.getPage(page, limit, userUrl);
-        return ResponseEntity.ok(Result.success(pageInfo));
+        return Result.success(pageInfo);
     }
 }

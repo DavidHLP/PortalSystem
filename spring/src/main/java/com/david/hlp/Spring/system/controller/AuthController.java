@@ -51,7 +51,7 @@ public class AuthController extends BaseController {
     public Result<String> registerUser(@RequestBody final RegistrationDTO request) {
         try {
             Objects.requireNonNull(request, "注册请求不能为空");
-            authService.demoAddUser(request);
+            authService.addUser(request);
             return Result.success("注册成功");
         } catch (final DuplicateKeyException e) {
             throw new BusinessException(ResultCode.USER_EXISTS);

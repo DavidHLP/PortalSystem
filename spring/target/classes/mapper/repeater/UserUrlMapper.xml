@@ -93,4 +93,13 @@
         FROM user_url
         ORDER BY id DESC
     </select>
+
+    <!-- getByEmail --> 
+
+    <select id="getByEmail" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM user_url
+        WHERE email = #{email}
+    </select>
 </mapper>

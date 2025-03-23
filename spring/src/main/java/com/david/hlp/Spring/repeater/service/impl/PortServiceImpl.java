@@ -88,7 +88,7 @@ public class PortServiceImpl implements PortService {
         if (!StringUtils.hasText(port.getNumber())) {
             throw new BusinessException("端口号不能为空");
         }
-        
+
         PortUrl existPort = portMapper.getPortByNumber(port.getNumber());
         if (existPort != null) {
             throw new BusinessException("端口号已存在");

@@ -9,3 +9,11 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+import type { Permissions } from '@/api/auth/auth.d'
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $hasPermission: (userPermissions: Permissions[], requiredPermissions: Permissions) => boolean
+  }
+}

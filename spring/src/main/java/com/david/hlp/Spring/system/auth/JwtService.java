@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import com.david.hlp.Spring.system.mapper.TokenMapper;
 import com.david.hlp.Spring.system.token.Token;
+import com.david.hlp.Spring.repeater.entity.UserUrl;
 /**
  * JWT 服务类，提供生成、解析和验证功能。
  */
@@ -67,6 +68,17 @@ public class JwtService {
     return Jwts.builder()
             .setClaims(claims)
             .setSubject(userDetails.getUsername())
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24小时
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .compact();
+  }
+
+  public String generateToken(UserUrl userUrl) {
+    Map<String, Object> claims = new HashMap<>();
+    return Jwts.builder()
+            .setClaims(claims)
+            .setSubject(userUrl.getUsername())
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24小时
             .signWith(getSignInKey(), SignatureAlgorithm.HS256)
