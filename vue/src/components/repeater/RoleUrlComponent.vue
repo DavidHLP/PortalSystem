@@ -16,30 +16,41 @@
     <el-card class="table-card">
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="roleName" label="角色名称" min-width="120" />
+        <el-table-column prop="roleName" label="角色名称" min-width="80" />
+        <el-table-column prop="project.id" label="项目ID" width="100" />
         <el-table-column prop="project.projectName" label="所属项目" min-width="120" />
         <el-table-column prop="project.projectInterfaceName" label="项目别名" min-width="120" />
-        <el-table-column prop="project.id" label="项目ID" width="100" />
-        <!-- <el-table-column prop="description" label="描述" min-width="150">
-          <template #default="{ row }">
-            <el-popover
-              placement="top-start"
-              :width="400"
-              trigger="hover"
-            >
-              <template #reference>
-                <span class="description-preview">{{ row.description || '暂无描述' }}</span>
-              </template>
-              <markdown-view :content="row.description || '暂无描述'" />
-            </el-popover>
-          </template>
-        </el-table-column> -->
-        <el-table-column prop="createdAt" label="创建时间" width="180" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
-            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
-            <el-button type="info" link @click="handleViewDetail(row)">查看详细</el-button>
+            <el-button-group>
+              <el-tooltip content="查看详情" placement="top">
+                <el-button
+                  size="small"
+                  @click="handleViewDetail(row)"
+                  type="info"
+                  icon="Document"
+                  circle
+                ></el-button>
+              </el-tooltip>
+              <el-tooltip content="编辑" placement="top">
+                <el-button
+                  size="small"
+                  @click="handleEdit(row)"
+                  type="primary"
+                  icon="Edit"
+                  circle
+                ></el-button>
+              </el-tooltip>
+              <el-tooltip content="删除" placement="top">
+                <el-button
+                  size="small"
+                  @click="handleDelete(row)"
+                  type="danger"
+                  icon="Delete"
+                  circle
+                ></el-button>
+              </el-tooltip>
+            </el-button-group>
           </template>
         </el-table-column>
       </el-table>
@@ -58,8 +69,9 @@
     </el-card>
 
     <el-drawer
+      v-if="dialogType !== 'view'"
       v-model="dialogVisible"
-      :title="dialogType === 'add' ? '新增角色' : dialogType === 'edit' ? '编辑角色' : '角色详情'"
+      :title="dialogType === 'add' ? '新增角色' : '编辑角色'"
       size="800px"
       destroy-on-close
       direction="rtl"
@@ -72,83 +84,136 @@
             :model="form"
             :rules="rules"
             label-width="100px"
-            :disabled="dialogType === 'view'"
             class="role-form"
           >
-            <el-card class="form-card" shadow="never">
-              <template #header>
-                <div class="card-header">
-                  <span>基本信息</span>
-                </div>
-              </template>
-              <el-form-item label="角色名称" prop="roleName">
-                <el-input
-                  v-model="form.roleName"
-                  placeholder="请输入角色名称"
-                  clearable
-                  :maxlength="50"
-                  show-word-limit
-                />
-              </el-form-item>
-              <el-form-item label="所属项目" prop="projectId">
-                <el-select
-                  v-model="form.projectId"
-                  placeholder="请选择项目"
-                  style="width: 100%"
-                  filterable
-                  clearable
-                >
-                  <el-option
-                    v-for="item in projectOptions"
-                    :key="item.id"
-                    :label="item.projectName"
-                    :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="描述" prop="description">
-                <md-editor-element
-                  v-model="form.description"
-                  :height="200"
-                  :min-height="150"
-                  :max-height="300"
-                  :auto-resize="true"
-                  placeholder="请输入描述信息，支持Markdown格式..."
-                  :theme="'dark'"
-                  :toolbars="dialogType === 'view' ? [] : undefined"
-                />
-              </el-form-item>
-            </el-card>
-
-            <el-card v-if="form.id" class="form-card url-card" shadow="never">
-              <template #header>
-                <div class="card-header">
-                  <span>URL配置</span>
-                </div>
-              </template>
-              <role-url-tree-component :role-id="form.id" @update="handleUrlUpdate" />
-            </el-card>
-
-            <el-card v-if="form.id" class="form-card doc-card" shadow="never">
-              <template #header>
-                <div class="card-header">
-                  <span>文档预览</span>
-                </div>
-              </template>
-              <div class="doc-content">
-                <markdown-view
-                  :content="form.description || '暂无文档'"
-                  :theme="'dark'"
-                />
+            <div class="form-section">
+              <div class="section-header">
+                <span>基本信息</span>
               </div>
-            </el-card>
+              <div class="section-content">
+                <el-form-item label="角色名称" prop="roleName">
+                  <el-input
+                    v-model="form.roleName"
+                    placeholder="请输入角色名称"
+                    clearable
+                    :maxlength="50"
+                    show-word-limit
+                  />
+                </el-form-item>
+                <el-form-item label="所属项目" prop="projectId">
+                  <el-select
+                    v-model="form.projectId"
+                    placeholder="请选择项目"
+                    style="width: 100%"
+                    filterable
+                    clearable
+                  >
+                    <el-option
+                      v-for="item in projectOptions"
+                      :key="item.id"
+                      :label="item.projectName"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="描述" prop="description">
+                  <md-editor-element
+                    v-model="form.description"
+                    :height="200"
+                    :min-height="150"
+                    :max-height="300"
+                    :auto-resize="true"
+                    placeholder="请输入描述信息，支持Markdown格式..."
+                    :theme="'dark'"
+                  />
+                </el-form-item>
+              </div>
+            </div>
+
+            <div v-if="form.id" class="form-section">
+              <div class="section-header">
+                <span>URL配置</span>
+              </div>
+              <div class="section-content">
+                <role-url-tree-component :role-id="form.id" @update="handleUrlUpdate" />
+              </div>
+            </div>
           </el-form>
         </div>
       </el-scrollbar>
       <template #footer>
         <div class="drawer-footer">
-          <el-button @click="dialogVisible = false">{{ dialogType === 'view' ? '关闭' : '取消' }}</el-button>
-          <el-button v-if="dialogType !== 'view'" type="primary" @click="handleSubmit">确定</el-button>
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleSubmit">确定</el-button>
+        </div>
+      </template>
+    </el-drawer>
+
+    <!-- 查看详情抽屉 -->
+    <el-drawer
+      v-if="dialogType === 'view'"
+      v-model="dialogVisible"
+      title="角色详情"
+      size="800px"
+      destroy-on-close
+      direction="rtl"
+      class="role-drawer view-drawer"
+    >
+      <el-scrollbar>
+        <div class="drawer-content">
+          <el-card class="info-card" shadow="never">
+            <template #header>
+              <div class="card-header">
+                <span>基本信息</span>
+              </div>
+            </template>
+            <div class="info-list">
+              <div class="info-item">
+                <span class="label">角色名称：</span>
+                <span class="value">{{ form.roleName }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">所属项目：</span>
+                <span class="value">{{ projectOptions.find(p => p.id === form.projectId)?.projectName }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">项目ID：</span>
+                <span class="value">{{ form.projectId }}</span>
+              </div>
+            </div>
+          </el-card>
+
+          <el-card class="url-card" shadow="never">
+            <template #header>
+              <div class="card-header">
+                <span>URL配置</span>
+              </div>
+            </template>
+            <role-url-tree-component
+              :role-id="form.id || 0"
+              :readonly="true"
+            />
+          </el-card>
+
+          <el-card class="description-card" shadow="never">
+            <template #header>
+              <div class="card-header">
+                <span>描述信息</span>
+              </div>
+            </template>
+            <div class="markdown-content">
+              <markdown-view
+                :content="form.description || '暂无描述'"
+                :theme="'dark'"
+              />
+            </div>
+          </el-card>
+        </div>
+      </el-scrollbar>
+      <template #footer>
+        <div class="drawer-footer">
+          <el-button @click="dialogVisible = false">关闭</el-button>
+          <el-button type="primary" @click="handleEdit({...form} as RoleUrl)">编辑</el-button>
         </div>
       </template>
     </el-drawer>
@@ -164,7 +229,6 @@ import {
   createRoleUrl,
   updateRoleUrl,
   deleteRoleUrl,
-  getRoleUrlById
 } from '@/api/repeater/roleurl'
 import type { RoleUrl } from '@/types/repeater/roleurl'
 import type { PageInfo } from '@/utils/types/common'
@@ -255,7 +319,18 @@ const handleAdd = () => {
 
 const handleEdit = (row: RoleUrl) => {
   dialogType.value = 'edit'
-  Object.assign(form, row)
+  Object.assign(form, {
+    id: row.id,
+    roleName: row.roleName || '',
+    projectId: row.projectId || 0,
+    description: row.description || '',
+    protocol: row.protocol || '',
+    hostId: row.hostId || 0,
+    portId: row.portId || 0,
+    routerId: row.routerId || 0,
+    method: row.method || '',
+    isActive: row.isActive ?? true
+  })
   dialogVisible.value = true
 }
 
@@ -307,7 +382,18 @@ const handleSubmit = async () => {
 
 const handleViewDetail = (row: RoleUrl) => {
   dialogType.value = 'view'
-  Object.assign(form, row)
+  Object.assign(form, {
+    id: row.id,
+    roleName: row.roleName || '',
+    projectId: row.projectId || 0,
+    description: row.description || '',
+    protocol: row.protocol || '',
+    hostId: row.hostId || 0,
+    portId: row.portId || 0,
+    routerId: row.routerId || 0,
+    method: row.method || '',
+    isActive: row.isActive ?? true
+  })
   dialogVisible.value = true
 }
 
@@ -355,47 +441,6 @@ onMounted(() => {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-
-  .drawer-footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 16px;
-    background-color: var(--el-bg-color);
-    border-top: 1px solid var(--el-border-color-light);
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-  }
-
-  :deep(.el-drawer__body) {
-    padding: 20px;
-    height: calc(100% - 120px);
-    overflow-y: auto;
-  }
-
-  .doc-card {
-    margin-top: 8px;
-
-    .doc-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .doc-content {
-      max-height: 400px;
-      overflow-y: auto;
-    }
-  }
-
-  :deep(.el-form-item.is-disabled) {
-    .el-input__wrapper,
-    .el-textarea__wrapper {
-      background-color: var(--el-bg-color-page);
-    }
-  }
 }
 
 .role-drawer {
@@ -411,48 +456,32 @@ onMounted(() => {
   }
 
   .role-form {
-    .form-card {
+    .form-section {
       margin-bottom: 20px;
       border: 1px solid var(--el-border-color-light);
+      border-radius: 4px;
       background-color: var(--el-bg-color-page);
+      overflow: hidden;
 
       &:last-child {
         margin-bottom: 0;
       }
 
-      .card-header {
+      .section-header {
         display: flex;
         align-items: center;
-        height: 32px;
+        height: 48px;
+        padding: 0 20px;
         font-size: 15px;
         font-weight: 500;
         color: var(--el-text-color-primary);
-      }
-
-      :deep(.el-card__header) {
-        padding: 12px 20px;
+        background-color: var(--el-bg-color);
         border-bottom: 1px solid var(--el-border-color-light);
       }
 
-      :deep(.el-card__body) {
+      .section-content {
         padding: 20px;
-      }
-    }
-
-    .url-card {
-      :deep(.el-tree) {
-        background-color: transparent;
-      }
-    }
-
-    .doc-card {
-      .doc-content {
-        padding: 16px;
-        background-color: var(--el-bg-color);
-        border-radius: 4px;
-        min-height: 200px;
-        max-height: 400px;
-        overflow-y: auto;
+        background-color: var(--el-bg-color-page);
       }
     }
 
@@ -465,6 +494,74 @@ onMounted(() => {
 
       .el-form-item__label {
         font-weight: 500;
+      }
+    }
+
+    :deep(.el-tree) {
+      background-color: transparent;
+    }
+  }
+
+  &.view-drawer {
+    .drawer-content {
+      .info-card,
+      .description-card,
+      .url-card {
+        margin-bottom: 16px;
+        border: 1px solid var(--el-border-color-light);
+        background-color: var(--el-bg-color-page);
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        :deep(.el-card__header) {
+          padding: 12px 20px;
+          border-bottom: 1px solid var(--el-border-color-light);
+          background-color: var(--el-bg-color);
+        }
+
+        .card-header {
+          display: flex;
+          align-items: center;
+          height: 32px;
+          font-size: 15px;
+          font-weight: 500;
+          color: var(--el-text-color-primary);
+        }
+
+        :deep(.el-card__body) {
+          padding: 20px;
+        }
+      }
+
+      .info-list {
+        .info-item {
+          display: flex;
+          margin-bottom: 16px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .label {
+            width: 100px;
+            color: var(--el-text-color-regular);
+            font-weight: 500;
+          }
+
+          .value {
+            flex: 1;
+            color: var(--el-text-color-primary);
+          }
+        }
+      }
+
+      .markdown-content {
+        min-height: 100px;
+        padding: 16px;
+        background-color: var(--el-bg-color);
+        border-radius: 4px;
       }
     }
   }
