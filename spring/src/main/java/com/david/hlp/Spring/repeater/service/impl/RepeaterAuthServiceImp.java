@@ -2,15 +2,11 @@ package com.david.hlp.Spring.repeater.service.impl;
 
 import com.david.hlp.Spring.repeater.mapper.UserUrlMapper;
 import com.david.hlp.Spring.system.entity.auth.LoginDTO;
-import com.david.hlp.Spring.system.entity.auth.RegistrationDTO;
 import com.david.hlp.Spring.system.service.AuthService;
-import com.david.hlp.Spring.system.token.Token;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.david.hlp.Spring.system.mapper.TokenMapper;
 import com.david.hlp.Spring.system.auth.JwtService;
-import com.david.hlp.Spring.system.mapper.RoleMapper;
 import com.david.hlp.Spring.common.exception.BusinessException;
 import com.david.hlp.Spring.common.enums.ResultCode;
 import com.david.hlp.Spring.repeater.entity.TokenUrl;

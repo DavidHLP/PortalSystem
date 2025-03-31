@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.david.hlp.Spring.common.result.Result;
 import com.david.hlp.Spring.system.entity.role.Role;
 import com.david.hlp.Spring.system.service.imp.RoleServiceImp;
-import com.david.hlp.Spring.system.util.annotation.validatestring.ValidateString;
+import com.david.hlp.Spring.common.util.annotation.validatestring.ValidateString;
 
 import lombok.RequiredArgsConstructor;
 

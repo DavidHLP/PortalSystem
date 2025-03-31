@@ -2,8 +2,9 @@ package com.david.hlp.Spring.repeater.service;
 
 import com.david.hlp.Spring.repeater.entity.PortUrl;
 import java.util.List;
+
+import com.david.hlp.Spring.common.interfaceI.BaseService;
 import com.david.hlp.Spring.common.result.PageInfo;
-import com.david.hlp.Spring.common.baseinterface.BaseService;
 
 /**
  * 端口服务接口

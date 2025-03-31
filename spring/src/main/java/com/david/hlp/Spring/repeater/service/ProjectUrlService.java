@@ -1,8 +1,8 @@
 package com.david.hlp.Spring.repeater.service;
 
+import com.david.hlp.Spring.common.interfaceI.BaseService;
 import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.repeater.entity.ProjectUrl;
-import com.david.hlp.Spring.common.baseinterface.BaseService;
 
 import java.util.List;
 

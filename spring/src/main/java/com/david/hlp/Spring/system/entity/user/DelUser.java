@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import com.david.hlp.Spring.system.util.annotation.emptystring.NotEmptyString;
+import com.david.hlp.Spring.common.util.annotation.emptystring.NotEmptyString;
 
 /**
  * 删除用户实体类
