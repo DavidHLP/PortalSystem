@@ -3,7 +3,7 @@ package com.david.hlp.Spring.cloud;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import com.david.hlp.Spring.repeater.entity.Repeater;
+
 import java.util.Map;
 
 @Service

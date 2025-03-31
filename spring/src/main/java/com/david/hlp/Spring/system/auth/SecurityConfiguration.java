@@ -27,16 +27,9 @@ public class SecurityConfiguration {
                     "/api/user/**",
                     "/api/role/**",
                     "/api/repeater/**",
-                    "/doc.html",
-                    "/doc.html/**",
-                    "/v3/api-docs",
-                    "/v3/api-docs/**",
-                    "/webjars/**",
                     "/authenticate",
-                    "/swagger-ui.html/**",
-                    "/swagger-resources",
-                    "/swagger-resources/**",
-                    "/api/repeater/**"
+                    "/api/repeater/**",
+                    "/api/project/**"
                 ).permitAll()
                 .requestMatchers("/api/user/**").hasRole("ADMIN")
                 .requestMatchers("/api/role/**").hasRole("ADMIN")

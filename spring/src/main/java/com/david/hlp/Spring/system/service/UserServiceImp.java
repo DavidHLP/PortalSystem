@@ -31,7 +31,7 @@ public class UserServiceImp {
         Long total = userMapper.count(query); // 获取总记录数
         PageInfo<User> pageInfo = PageInfo.<User>builder()
                 .items(users)
-                .query(query)
+                .item(query)
                 .pageNum(pageNum)
                 .pageSize(pageSize)
                 .total(total)

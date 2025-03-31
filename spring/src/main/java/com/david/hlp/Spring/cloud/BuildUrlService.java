@@ -1,6 +1,5 @@
 package com.david.hlp.Spring.cloud;
 
-import com.david.hlp.Spring.repeater.entity.Repeater;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 

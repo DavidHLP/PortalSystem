@@ -39,7 +39,7 @@ public class UserController extends BaseController {
         return Result.success(userService.getUserManageInfo(
             pageInfo.getPageNum(),
             pageInfo.getPageSize(),
-            pageInfo.getQuery()
+            pageInfo.getItem()
         ));
     }
 

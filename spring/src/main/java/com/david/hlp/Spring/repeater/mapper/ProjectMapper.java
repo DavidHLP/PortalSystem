@@ -1,101 +1,47 @@
 package com.david.hlp.Spring.repeater.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import com.david.hlp.Spring.repeater.module.entity.Project;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import com.david.hlp.Spring.repeater.entity.ProjectUrl;
-import java.util.List;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
-/**
- * 项目URL映射接口
- *
- * @author david
- */
 @Mapper
-public interface ProjectMapper extends BaseMapper<ProjectUrl> {
+public interface ProjectMapper {
 
     /**
-     * 获取项目列表
-     *
-     * @param limit 限制条数
-     * @param offset 偏移量
-     * @param projectName 项目名称
-     * @param projectInterfaceName 接口名称
+     * 插入项目信息
+     * @param project 项目信息实体
+     * @return 插入结果
+     */
+    int insertProject(Project project);
+
+    /**
+     * 分页查询项目列表
+     * @param project 查询条件
+     * @param pageNum 页码
+     * @param pageSize 每页条数
      * @return 项目列表
      */
-    List<ProjectUrl> listProjects(@Param("limit") Integer limit, @Param("offset") Integer offset,
-            @Param("projectName") String projectName, @Param("projectInterfaceName") String projectInterfaceName);
+    List<Project> listProject(@Param("project") Project project, @Param("pageSize") Integer pageSize, @Param("offset") Integer offset);
 
     /**
-     * 根据ID获取项目信息
-     *
-     * @param id 项目ID
-     * @return 项目信息
+     * 查询项目总数
+     * @param project 查询条件
+     * @return 总数
      */
-    ProjectUrl getProjectById(@Param("id") Integer id);
-
-    /**
-     * 新增项目
-     *
-     * @param projectUrl 项目信息
-     * @return 影响行数
-     */
-    int insertProject(ProjectUrl projectUrl);
+    Long countProject(@Param("project") Project project);
 
     /**
      * 更新项目信息
-     *
-     * @param projectUrl 项目信息
-     * @return 影响行数
+     * @param project 项目信息实体
+     * @return 更新结果
      */
-    int updateProject(ProjectUrl projectUrl);
+    int updateProject(Project project);
 
     /**
-     * 根据ID删除项目
-     *
-     * @param id 项目ID
-     * @return 影响行数
+     * 删除项目信息
+     * @param project 项目信息实体
+     * @return 删除结果
      */
-    int deleteProjectById(@Param("id") Integer id);
-
-    /**
-     * 检查项目名称是否存在
-     *
-     * @param projectName 项目名称
-     * @return 存在返回1，不存在返回0
-     */
-    int checkProjectNameExists(@Param("projectName") String projectName);
-
-    /**
-     * 获取项目总数
-     *
-     * @param projectName 项目名称
-     * @param projectInterfaceName 接口名称
-     * @return 项目总数
-     */
-    long getProjectCount(@Param("projectName") String projectName, @Param("projectInterfaceName") String projectInterfaceName);
-
-    /**
-     * 获取所有项目基本信息列表
-     *
-     * @return 项目基本信息列表
-     */
-    List<ProjectUrl> listProjectBasicInfo();
-
-    /**
-     * 根据ID获取项目基本信息
-     *
-     * @param id 项目ID
-     * @return 项目基本信息
-     */
-    ProjectUrl getProjectBasicInfoById(@Param("id") Integer id);
-
-    /**
-     * 根据ID获取项目详细信息
-     *
-     * @param id 项目ID
-     * @return 项目详细信息
-     */
-    ProjectUrl getById(@Param("id") Integer id);
+    int deleteProject(Project project);
 }
