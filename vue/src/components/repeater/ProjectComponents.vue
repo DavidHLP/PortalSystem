@@ -126,6 +126,8 @@ const submitForm = async () => {
 
         // 发射成功事件
         emit('success')
+        // 清除表单数据
+        reset()
         // 关闭对话框
         visible.value = false
       } catch (error) {

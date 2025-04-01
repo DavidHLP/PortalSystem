@@ -63,4 +63,12 @@ public class ProjectServiceImpl {
     public void deleteProject(Project project) {
         projectMapper.deleteProject(project);
     }
+
+    /**
+     * 查询所有项目信息
+     * @return 所有项目信息
+     */
+    public List<Project> listAllProject() {
+        return projectMapper.listAllProject();
+    }
 }

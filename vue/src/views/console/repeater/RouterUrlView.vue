@@ -3,13 +3,35 @@
     <!-- 搜索工具栏 -->
     <el-card class="search-form-container">
       <el-form :model="queryParams" ref="queryForm" :inline="true">
-        <el-form-item label="项目名称" prop="projectName">
+        <el-form-item label="主机地址" prop="host">
           <el-input
-            v-model="queryParams.projectName"
-            placeholder="请输入项目名称"
+            v-model="queryParams.host"
+            placeholder="请输入主机地址"
             clearable
             @keyup.enter="handleQuery"
           />
+        </el-form-item>
+        <el-form-item label="路由路径" prop="router">
+          <el-input
+            v-model="queryParams.router"
+            placeholder="请输入路由路径"
+            clearable
+            @keyup.enter="handleQuery"
+          />
+        </el-form-item>
+        <el-form-item label="协议类型" prop="protocol">
+          <el-select v-model="queryParams.protocol" placeholder="请选择协议类型" clearable>
+            <el-option label="HTTP" value="HTTP" />
+            <el-option label="HTTPS" value="HTTPS" />
+            <el-option label="TCP" value="TCP" />
+            <el-option label="UDP" value="UDP" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="路由类型" prop="type">
+          <el-select v-model="queryParams.type" placeholder="请选择路由类型" clearable>
+            <el-option label="内部" :value="0" />
+            <el-option label="外部" :value="1" />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleQuery">
@@ -26,7 +48,7 @@
     <el-card class="table-container">
       <template #header>
         <div class="card-header">
-          <span class="card-title">项目列表</span>
+          <span class="card-title">路由URL列表</span>
           <el-button
             type="primary"
             @click="handleAdd"
@@ -39,7 +61,7 @@
       <!-- 表格数据 -->
       <el-table
         v-loading="loading"
-        :data="projectList"
+        :data="routerUrlList"
         border
         stripe
       >
@@ -50,11 +72,45 @@
           align="center"
         />
         <el-table-column
-          label="项目名称"
-          prop="projectName"
-          min-width="180"
+          label="主机地址"
+          prop="host"
+          min-width="120"
           :show-overflow-tooltip="true"
         />
+        <el-table-column
+          label="端口号"
+          prop="port"
+          width="100"
+          align="center"
+        />
+        <el-table-column
+          label="路由路径"
+          prop="router"
+          min-width="150"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          label="协议类型"
+          prop="protocol"
+          width="100"
+          align="center"
+        />
+        <el-table-column
+          label="唯一标识"
+          prop="uniqueId"
+          min-width="120"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          label="路由类型"
+          prop="type"
+          width="100"
+          align="center"
+        >
+          <template #default="scope">
+            {{ scope.row.type === 0 ? '内部' : '外部' }}
+          </template>
+        </el-table-column>
         <el-table-column
           label="文档说明"
           prop="doc"
@@ -63,7 +119,7 @@
         >
           <template #default="scope">
             <div class="doc-preview">
-              {{ truncateDoc(scope.row.doc.slice(0, 20)) }}
+              {{ truncateDoc(scope.row.doc) }}
               <el-button v-if="scope.row.doc" type="primary" link @click="viewFullDoc(scope.row.doc)">
                 查看详情
               </el-button>
@@ -128,11 +184,11 @@
       />
     </el-card>
 
-    <!-- 项目编辑组件 -->
-    <ProjectComponents
-      ref="projectFormRef"
-      :project="editProject"
-      @success="getProjectList"
+    <!-- 路由URL编辑组件 -->
+    <RouterUrlComponents
+      ref="routerUrlFormRef"
+      :router-url="editRouterUrl"
+      @success="getRouterUrlList"
     />
 
     <!-- Markdown文档查看抽屉 -->
@@ -152,10 +208,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-import type { Project } from '@/types/repeater/project'
+import type { RouterUrl } from '@/types/repeater/routerurl'
 import type { PageInfo } from '@/types/common'
-import { listProject, deleteProject } from '@/api/repeater/project'
-import ProjectComponents from '@/components/repeater/ProjectComponents.vue'
+import { listRouterUrl, deleteRouterUrl } from '@/api/repeater/routerurl'
+import RouterUrlComponents from '@/components/repeater/RouterUrlComponents.vue'
 import MarkdownView from '@/components/markdown/MarkdownView.vue'
 
 /**
@@ -180,24 +236,27 @@ const formatDateTime = (time: string | number | Date): string => {
 
 // 加载状态
 const loading = ref(false)
-// 项目列表
-const projectList = ref<Project[]>([])
-// 编辑的项目对象
-const editProject = ref<Project>()
-// 项目表单组件引用
-const projectFormRef = ref()
+// 路由URL列表
+const routerUrlList = ref<RouterUrl[]>([])
+// 编辑的路由URL对象
+const editRouterUrl = ref<RouterUrl>()
+// 路由URL表单组件引用
+const routerUrlFormRef = ref()
 
 // 分页参数
-const pageInfo = reactive<PageInfo<Project>>({
+const pageInfo = reactive<PageInfo<RouterUrl>>({
   pageNum: 1,
   pageSize: 10,
   total: 0,
-  item: {}
+  item: {} as RouterUrl
 })
 
 // 查询参数
-const queryParams = reactive<Project>({
-  projectName: ''
+const queryParams = reactive<Partial<RouterUrl>>({
+  host: '',
+  router: '',
+  protocol: '',
+  type: undefined
 })
 
 // 文档相关
@@ -205,22 +264,30 @@ const docDrawerVisible = ref(false)
 const currentDoc = ref('')
 
 /**
- * 获取项目列表
+ * 获取路由URL列表
  */
-const getProjectList = async () => {
+const getRouterUrlList = async () => {
   loading.value = true
   try {
     // 设置查询条件
     pageInfo.item = {
-      projectName: queryParams.projectName
+      host: queryParams.host || '',
+      router: queryParams.router || '',
+      protocol: queryParams.protocol || '',
+      type: queryParams.type || '',
+      port: queryParams.port || '',
+      uniqueId: '',
+      doc: ''
     }
 
-    const res = await listProject(pageInfo)
-    projectList.value = res.items || []
-    pageInfo.total = res.total || 0
+    const res = await listRouterUrl(pageInfo)
+    if (res.items) {
+      routerUrlList.value = (res.items || []) as RouterUrl[]
+      pageInfo.total = res.total || 0
+    }
   } catch (error) {
-    console.error('获取项目列表失败', error)
-    ElMessage.error('获取项目列表失败')
+    console.error('获取路由URL列表失败', error)
+    ElMessage.error('获取路由URL列表失败')
   } finally {
     loading.value = false
   }
@@ -231,14 +298,17 @@ const getProjectList = async () => {
  */
 const handleQuery = () => {
   pageInfo.pageNum = 1
-  getProjectList()
+  getRouterUrlList()
 }
 
 /**
  * 重置查询
  */
 const resetQuery = () => {
-  queryParams.projectName = ''
+  queryParams.host = ''
+  queryParams.router = ''
+  queryParams.protocol = ''
+  queryParams.type = undefined
   handleQuery()
 }
 
@@ -247,7 +317,7 @@ const resetQuery = () => {
  */
 const handleSizeChange = (size: number) => {
   pageInfo.pageSize = size
-  getProjectList()
+  getRouterUrlList()
 }
 
 /**
@@ -255,31 +325,39 @@ const handleSizeChange = (size: number) => {
  */
 const handleCurrentChange = (page: number) => {
   pageInfo.pageNum = page
-  getProjectList()
+  getRouterUrlList()
 }
 
 /**
  * 处理添加
  */
 const handleAdd = () => {
-  editProject.value = {}
-  projectFormRef.value.open()
+  editRouterUrl.value = {
+    host: '',
+    port: '',
+    router: '',
+    protocol: 'HTTP',
+    uniqueId: '',
+    type: '',
+    doc: ''
+  }
+  routerUrlFormRef.value.open()
 }
 
 /**
  * 处理编辑
  */
-const handleEdit = (row: Project) => {
-  editProject.value = { ...row }
-  projectFormRef.value.open()
+const handleEdit = (row: RouterUrl) => {
+  editRouterUrl.value = { ...row }
+  routerUrlFormRef.value.open()
 }
 
 /**
  * 处理删除
  */
-const handleDelete = (row: Project) => {
+const handleDelete = (row: RouterUrl) => {
   ElMessageBox.confirm(
-    `确认删除项目"${row.projectName}"吗？`,
+    `确认删除路由URL"${row.host}:${row.port}${row.router}"吗？`,
     '提示',
     {
       confirmButtonText: '确定',
@@ -288,9 +366,18 @@ const handleDelete = (row: Project) => {
     }
   ).then(async () => {
     try {
-      await deleteProject({ id: row.id })
+      await deleteRouterUrl({
+        id: row.id,
+        host: row.host,
+        port: row.port,
+        router: row.router,
+        protocol: row.protocol,
+        uniqueId: row.uniqueId,
+        type: row.type,
+        doc: row.doc
+      })
       ElMessage.success('删除成功')
-      getProjectList()
+      getRouterUrlList()
     } catch (error) {
       console.error('删除失败', error)
       ElMessage.error('删除失败，请稍后重试')
@@ -308,7 +395,7 @@ const handleDelete = (row: Project) => {
 const truncateDoc = (doc: string): string => {
   if (!doc) return '';
   const maxLength = 50;
-  return doc.length > maxLength ? doc.substring(0, maxLength) + '...' : doc;
+  return String(doc).length > maxLength ? String(doc).substring(0, maxLength) + '...' : String(doc);
 }
 
 /**
@@ -316,13 +403,13 @@ const truncateDoc = (doc: string): string => {
  * @param doc 文档内容
  */
 const viewFullDoc = (doc: string) => {
-  currentDoc.value = doc;
+  currentDoc.value = doc || '';  // 确保doc为空时返回空字符串
   docDrawerVisible.value = true;
 }
 
 // 组件挂载时获取数据
 onMounted(() => {
-  getProjectList()
+  getRouterUrlList()
 })
 </script>
 
@@ -354,5 +441,11 @@ onMounted(() => {
 .pagination {
   margin-top: 20px;
   text-align: right;
+}
+
+.doc-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 </style>

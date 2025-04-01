@@ -61,4 +61,12 @@
         SET is_deleted = 1
         WHERE id = #{id}
     </delete>
+
+    <!-- listAllProject --> 
+
+    <select id="listAllProject" resultType="com.david.hlp.Spring.repeater.module.entity.Project">
+        SELECT id, project_name, doc, gmt_create, gmt_modified, is_deleted
+        FROM project
+        WHERE is_deleted = 0
+    </select>
 </mapper>

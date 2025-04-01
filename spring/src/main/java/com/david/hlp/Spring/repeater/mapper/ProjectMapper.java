@@ -44,4 +44,10 @@ public interface ProjectMapper {
      * @return 删除结果
      */
     int deleteProject(Project project);
+
+    /**
+     * 查询所有项目信息
+     * @return 所有项目信息
+     */
+    List<Project> listAllProject();
 }

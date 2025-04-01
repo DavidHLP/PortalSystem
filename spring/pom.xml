@@ -157,6 +157,16 @@
 			</snapshots>
 		</repository>
 		<repository>
+			<id>aliyun</id>
+			<url>https://maven.aliyun.com/repository/central</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>central</id>
 			<name>Maven Central</name>
 			<url>https://repo.maven.apache.org/maven2</url>

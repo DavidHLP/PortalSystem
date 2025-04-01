@@ -1,5 +1,8 @@
 package com.david.hlp.Spring.repeater.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,5 +42,10 @@ public class ProjectController {
     public Result<Void> delete(@RequestBody Project project) {
         projectService.deleteProject(project);
         return Result.success("删除成功");
+    }
+
+    @GetMapping("/listAll")
+    public Result<List<Project>> listAll() {
+        return Result.success(projectService.listAllProject());
     }
 }

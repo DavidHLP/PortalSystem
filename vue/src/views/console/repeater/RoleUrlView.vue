@@ -3,9 +3,17 @@
     <!-- 搜索工具栏 -->
     <el-card class="search-form-container">
       <el-form :model="queryParams" ref="queryForm" :inline="true">
-        <el-form-item label="项目名称" prop="projectName">
+        <el-form-item label="角色名称" prop="roleName">
           <el-input
-            v-model="queryParams.projectName"
+            v-model="queryParams.roleName"
+            placeholder="请输入角色名称"
+            clearable
+            @keyup.enter="handleQuery"
+          />
+        </el-form-item>
+        <el-form-item label="项目名称" prop="project.projectName">
+          <el-input
+            v-model="queryParams.project!.projectName"
             placeholder="请输入项目名称"
             clearable
             @keyup.enter="handleQuery"
@@ -26,7 +34,7 @@
     <el-card class="table-container">
       <template #header>
         <div class="card-header">
-          <span class="card-title">项目列表</span>
+          <span class="card-title">角色URL列表</span>
           <el-button
             type="primary"
             @click="handleAdd"
@@ -39,7 +47,7 @@
       <!-- 表格数据 -->
       <el-table
         v-loading="loading"
-        :data="projectList"
+        :data="roleUrlList"
         border
         stripe
       >
@@ -50,20 +58,41 @@
           align="center"
         />
         <el-table-column
-          label="项目名称"
-          prop="projectName"
-          min-width="180"
+          label="角色名称"
+          prop="roleName"
+          min-width="160"
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          label="文档说明"
+          label="所属项目"
+          prop="project.projectName"
+          min-width="160"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          label="项目文档"
+          prop="project.doc"
+          min-width="220"
+          :show-overflow-tooltip="false"
+        >
+          <template #default="scope">
+            <div class="doc-preview">
+              {{ truncateDoc(scope.row.project.doc) }}
+              <el-button v-if="scope.row.project.doc" type="primary" link @click="viewFullDoc(scope.row.project.doc)">
+                查看详情
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="角色文档"
           prop="doc"
           min-width="220"
           :show-overflow-tooltip="false"
         >
           <template #default="scope">
             <div class="doc-preview">
-              {{ truncateDoc(scope.row.doc.slice(0, 20)) }}
+              {{ truncateDoc(scope.row.doc) }}
               <el-button v-if="scope.row.doc" type="primary" link @click="viewFullDoc(scope.row.doc)">
                 查看详情
               </el-button>
@@ -128,11 +157,11 @@
       />
     </el-card>
 
-    <!-- 项目编辑组件 -->
-    <ProjectComponents
-      ref="projectFormRef"
-      :project="editProject"
-      @success="getProjectList"
+    <!-- 角色URL编辑组件 -->
+    <RoleUrlCompoenrs
+      ref="roleUrlFormRef"
+      :roleUrl="editRoleUrl"
+      @success="getRoleUrlList"
     />
 
     <!-- Markdown文档查看抽屉 -->
@@ -152,10 +181,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-import type { Project } from '@/types/repeater/project'
+import type { RoleUrl } from '@/types/repeater/roleurl.ts'
 import type { PageInfo } from '@/types/common'
-import { listProject, deleteProject } from '@/api/repeater/project'
-import ProjectComponents from '@/components/repeater/ProjectComponents.vue'
+import { listRoleUrl, deleteRoleUrl } from '@/api/repeater/roleurl'
+import RoleUrlCompoenrs from '@/components/repeater/RoleUrlCompoenrs.vue'
 import MarkdownView from '@/components/markdown/MarkdownView.vue'
 
 /**
@@ -180,24 +209,34 @@ const formatDateTime = (time: string | number | Date): string => {
 
 // 加载状态
 const loading = ref(false)
-// 项目列表
-const projectList = ref<Project[]>([])
-// 编辑的项目对象
-const editProject = ref<Project>()
-// 项目表单组件引用
-const projectFormRef = ref()
+// 角色URL列表
+const roleUrlList = ref<RoleUrl[]>([])
+// 编辑的角色URL对象
+const editRoleUrl = ref<RoleUrl>({
+  roleName: '',
+  project: {
+    projectName: ''
+  }
+})
+// 角色URL表单组件引用
+const roleUrlFormRef = ref()
 
 // 分页参数
-const pageInfo = reactive<PageInfo<Project>>({
+const pageInfo = reactive<PageInfo<RoleUrl>>({
   pageNum: 1,
   pageSize: 10,
   total: 0,
-  item: {}
+  item: {
+    project: {}
+  }
 })
 
 // 查询参数
-const queryParams = reactive<Project>({
-  projectName: ''
+const queryParams = reactive<RoleUrl>({
+  roleName: '',
+  project: {
+    projectName: ''
+  }
 })
 
 // 文档相关
@@ -205,22 +244,25 @@ const docDrawerVisible = ref(false)
 const currentDoc = ref('')
 
 /**
- * 获取项目列表
+ * 获取角色URL列表
  */
-const getProjectList = async () => {
+const getRoleUrlList = async () => {
   loading.value = true
   try {
     // 设置查询条件
     pageInfo.item = {
-      projectName: queryParams.projectName
+      roleName: queryParams.roleName,
+      project: {
+        projectName: queryParams.project?.projectName || ''
+      }
     }
 
-    const res = await listProject(pageInfo)
-    projectList.value = res.items || []
+    const res = await listRoleUrl(pageInfo)
+    roleUrlList.value = res.items || []
     pageInfo.total = res.total || 0
   } catch (error) {
-    console.error('获取项目列表失败', error)
-    ElMessage.error('获取项目列表失败')
+    console.error('获取角色URL列表失败', error)
+    ElMessage.error('获取角色URL列表失败')
   } finally {
     loading.value = false
   }
@@ -231,14 +273,17 @@ const getProjectList = async () => {
  */
 const handleQuery = () => {
   pageInfo.pageNum = 1
-  getProjectList()
+  getRoleUrlList()
 }
 
 /**
  * 重置查询
  */
 const resetQuery = () => {
-  queryParams.projectName = ''
+  queryParams.roleName = ''
+  if (queryParams.project) {
+    queryParams.project.projectName = ''
+  }
   handleQuery()
 }
 
@@ -247,7 +292,7 @@ const resetQuery = () => {
  */
 const handleSizeChange = (size: number) => {
   pageInfo.pageSize = size
-  getProjectList()
+  getRoleUrlList()
 }
 
 /**
@@ -255,31 +300,36 @@ const handleSizeChange = (size: number) => {
  */
 const handleCurrentChange = (page: number) => {
   pageInfo.pageNum = page
-  getProjectList()
+  getRoleUrlList()
 }
 
 /**
  * 处理添加
  */
 const handleAdd = () => {
-  editProject.value = {}
-  projectFormRef.value.open()
+  editRoleUrl.value = {
+    roleName: '',
+    project: {
+      projectName: ''
+    }
+  }
+  roleUrlFormRef.value.open()
 }
 
 /**
  * 处理编辑
  */
-const handleEdit = (row: Project) => {
-  editProject.value = { ...row }
-  projectFormRef.value.open()
+const handleEdit = (row: RoleUrl) => {
+  editRoleUrl.value = { ...row }
+  roleUrlFormRef.value.open()
 }
 
 /**
  * 处理删除
  */
-const handleDelete = (row: Project) => {
+const handleDelete = (row: RoleUrl) => {
   ElMessageBox.confirm(
-    `确认删除项目"${row.projectName}"吗？`,
+    `确认删除角色"${row.roleName}"吗？`,
     '提示',
     {
       confirmButtonText: '确定',
@@ -288,9 +338,9 @@ const handleDelete = (row: Project) => {
     }
   ).then(async () => {
     try {
-      await deleteProject({ id: row.id })
+      await deleteRoleUrl({ id: row.id })
       ElMessage.success('删除成功')
-      getProjectList()
+      getRoleUrlList()
     } catch (error) {
       console.error('删除失败', error)
       ElMessage.error('删除失败，请稍后重试')
@@ -322,7 +372,7 @@ const viewFullDoc = (doc: string) => {
 
 // 组件挂载时获取数据
 onMounted(() => {
-  getProjectList()
+  getRoleUrlList()
 })
 </script>
 

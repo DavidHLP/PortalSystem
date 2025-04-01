@@ -1,0 +1,51 @@
+package com.david.hlp.Spring.repeater.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.david.hlp.Spring.common.result.PageInfo;
+import com.david.hlp.Spring.repeater.module.entity.RoleUrl;
+
+@Mapper
+public interface RoleUrlMapper {
+    /**
+     * 统计角色URL记录数
+     *
+     * @param roleUrl 查询条件
+     * @return 记录数
+     */
+    long countRoleUrl(RoleUrl roleUrl);
+    
+    /**
+     * 分页查询角色URL列表
+     *
+     * @param pageInfo 分页参数
+     * @return 角色URL列表
+     */
+    List<RoleUrl> listRoleUrl(PageInfo<RoleUrl> pageInfo);
+    
+    /**
+     * 新增角色URL
+     *
+     * @param roleUrl 角色URL信息
+     * @return 影响行数
+     */
+    int insertRoleUrl(RoleUrl roleUrl);
+    
+    /**
+     * 更新角色URL
+     *
+     * @param roleUrl 角色URL信息
+     * @return 影响行数
+     */
+    int updateRoleUrl(RoleUrl roleUrl);
+    
+    /**
+     * 删除角色URL
+     *
+     * @param roleUrl 角色URL信息
+     * @return 影响行数
+     */
+    int deleteRoleUrl(RoleUrl roleUrl);
+}

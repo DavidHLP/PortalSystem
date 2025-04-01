@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.david.hlp.Spring.repeater.mapper.RoleUrlMapper">
+    <resultMap id="BaseResultMap" type="com.david.hlp.Spring.repeater.module.entity.RoleUrl">
+        <id column="id" property="id" />
+        <result column="role_name" property="roleName" />
+        <result column="project_id" property="projectId" />
+        <result column="doc" property="doc" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+        <result column="is_deleted" property="isDeleted" />
+        <association property="project" javaType="com.david.hlp.Spring.repeater.module.entity.Project">
+            <id column="p_id" property="id" />
+            <result column="p_project_name" property="projectName" />
+            <result column="p_doc" property="doc" />
+            <result column="p_gmt_create" property="gmtCreate" />
+            <result column="p_gmt_modified" property="gmtModified" />
+            <result column="p_is_deleted" property="isDeleted" />
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ru.id, ru.role_name, ru.project_id, ru.doc, ru.gmt_create, ru.gmt_modified, ru.is_deleted,
+        p.id as p_id, p.project_name as p_project_name, p.doc as p_doc, p.gmt_create as p_gmt_create,
+        p.gmt_modified as p_gmt_modified, p.is_deleted as p_is_deleted
+    </sql>
+
+    <sql id="Where_Clause">
+        <where>
+            ru.is_deleted = 0 AND p.is_deleted = 0
+            <if test="item != null">
+                <if test="item.id != null">
+                    AND ru.id = #{item.id}
+                </if>
+                <if test="item.roleName != null and item.roleName != ''">
+                    AND ru.role_name LIKE CONCAT('%', #{item.roleName}, '%')
+                </if>
+                <if test="item.projectId != null">
+                    AND ru.project_id = #{item.projectId}
+                </if>
+                <if test="item.project != null and item.project.projectName != null and item.project.projectName != ''">
+                    AND p.project_name LIKE CONCAT('%', #{item.project.projectName}, '%')
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <select id="countRoleUrl" resultType="long" parameterType="com.david.hlp.Spring.repeater.module.entity.RoleUrl">
+        SELECT COUNT(1)
+        FROM role_url ru
+        LEFT JOIN project p ON ru.project_id = p.id
+        <where>
+            ru.is_deleted = 0 AND p.is_deleted = 0
+            <if test="id != null">
+                AND ru.id = #{id}
+            </if>
+            <if test="roleName != null and roleName != ''">
+                AND ru.role_name LIKE CONCAT('%', #{roleName}, '%')
+            </if>
+            <if test="projectId != null">
+                AND ru.project_id = #{projectId}
+            </if>
+            <if test="project != null and project.projectName != null and project.projectName != ''">
+                AND p.project_name LIKE CONCAT('%', #{project.projectName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="listRoleUrl" resultMap="BaseResultMap" parameterType="com.david.hlp.Spring.common.result.PageInfo">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM role_url ru
+        LEFT JOIN project p ON ru.project_id = p.id
+        <include refid="Where_Clause" />
+        ORDER BY ru.id DESC
+        <if test="pageNum != null and pageSize != null">
+            LIMIT #{pageNum}, #{pageSize}
+        </if>
+    </select>
+
+    <insert id="insertRoleUrl" parameterType="com.david.hlp.Spring.repeater.module.entity.RoleUrl" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO role_url
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">role_name,</if>
+            <if test="projectId != null">project_id,</if>
+            <if test="doc != null">doc,</if>
+            gmt_create,
+            gmt_modified,
+            is_deleted
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">#{roleName},</if>
+            <if test="projectId != null">#{projectId},</if>
+            <if test="doc != null">#{doc},</if>
+            NOW(),
+            NOW(),
+            0
+        </trim>
+    </insert>
+
+    <update id="updateRoleUrl" parameterType="com.david.hlp.Spring.repeater.module.entity.RoleUrl">
+        UPDATE role_url
+        <set>
+            <if test="roleName != null">role_name = #{roleName},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="doc != null">doc = #{doc},</if>
+            gmt_modified = NOW()
+        </set>
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <update id="deleteRoleUrl" parameterType="com.david.hlp.Spring.repeater.module.entity.RoleUrl">
+        UPDATE role_url
+        SET is_deleted = 1,
+            gmt_modified = NOW()
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+</mapper>

@@ -1,55 +1,66 @@
 import request from '@/utils/request/request'
-import type { PageInfo } from '@/types/common.ts'
-import type { Project } from '@/types/repeater/project.ts'
+import type { PageInfo } from '@/types/common'
+import type { Project } from '@/types/repeater/project'
 
 /**
- * 查询项目列表
- * @param data 查询参数
+ * 分页查询项目列表
+ * @param pageInfo 分页参数
  * @returns 分页结果
  */
-export function listProject(data: PageInfo<Project>): Promise<PageInfo<Project>> {
+export function listProject(pageInfo: PageInfo<Project>): Promise<PageInfo<Project>> {
   return request({
     url: '/api/project/list',
     method: 'post',
-    data
+    data: pageInfo
+  })
+}
+
+/**
+ * 获取所有项目列表（不分页）
+ * @returns 项目列表
+ */
+export function listAllProject(): Promise<Project[]> {
+  return request({
+    url: '/api/project/listAll',
+    method: 'get'
   })
 }
 
 /**
  * 添加项目
- * @param data 项目信息
- * @returns 处理结果
+ * @param project 项目信息
+ * @returns 结果
  */
-export function addProject(data: Project): Promise<void> {
+export function addProject(project: Project): Promise<void> {
   return request({
     url: '/api/project/add',
     method: 'post',
-    data
+    data: project
   })
 }
 
 /**
  * 更新项目
- * @param data 项目信息
- * @returns 处理结果
+ * @param project 项目信息
+ * @returns 结果
  */
-export function updateProject(data: Project): Promise<void> {
+export function updateProject(project: Project): Promise<void> {
   return request({
     url: '/api/project/update',
     method: 'post',
-    data
+    data: project
   })
 }
 
 /**
  * 删除项目
- * @param data 项目信息
- * @returns 处理结果
+ * @param project 项目信息
+ * @returns 结果
  */
-export function deleteProject(data: Project): Promise<void> {
+export function deleteProject(project: Project): Promise<void> {
   return request({
     url: '/api/project/delete',
     method: 'post',
-    data
+    data: project
   })
 }

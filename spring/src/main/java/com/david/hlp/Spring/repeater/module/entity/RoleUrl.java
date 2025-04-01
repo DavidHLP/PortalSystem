@@ -50,4 +50,9 @@ public class RoleUrl {
      */
     private Integer isDeleted;
 
+    /**
+     * 项目信息
+     */
+    private Project project;
+
 }
