@@ -53,3 +53,10 @@ export function deleteRoleUrl(roleUrl: RoleUrl): Promise<void> {
     data: roleUrl
   })
 }
+
+export function getRoleList(): Promise<RoleUrl[]> {
+  return request({
+    url: '/api/roleUrl/getRoleList',
+    method: 'post'
+  })
+}

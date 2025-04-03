@@ -1,6 +1,4 @@
 package com.david.hlp.Spring.system.filter;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -16,12 +14,6 @@ import org.springframework.lang.NonNull;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
-    @Value("${file.upload-dir}")
-    private String uploadPath;
-
-    @Value("${file.url-address}")
-    private String urlAddress;
 
     /**
      * 配置全局 CORS 过滤器。
@@ -51,7 +43,5 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(urlAddress + "**")
-                .addResourceLocations("file:" + uploadPath);
     }
 }

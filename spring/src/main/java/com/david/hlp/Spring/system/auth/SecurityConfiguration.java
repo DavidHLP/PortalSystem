@@ -31,7 +31,8 @@ public class SecurityConfiguration {
                     "/api/repeater/**",
                     "/api/project/**",
                     "/api/roleUrl/**",
-                    "/api/routerUrl/**"
+                    "/api/routerUrl/**",
+                    "/api/userUrl/**"
                 ).permitAll()
                 .requestMatchers("/api/user/**").hasRole("ADMIN")
                 .requestMatchers("/api/role/**").hasRole("ADMIN")

@@ -4,22 +4,22 @@
     <template v-if="link.meta?.type !== 'F'">
       <el-sub-menu v-if="link.meta?.type === 'M'" :index="link.path">
         <template #title>
-          <el-icon><component :is="link.meta?.icon || (link as any).icon" /></el-icon>
-          <span>{{ link.name }}</span>
+          <el-icon><component :is="link.meta?.metaIcon || (link as any).icon" /></el-icon>
+          <span>{{ link.meta?.name }}</span>
         </template>
         <SidebarMenuLinks :links="link.children || []" />
       </el-sub-menu>
       <el-sub-menu v-if="link.meta?.type === 'C' && (link.children?.length || 0) > 0 && link.children?.some(child => child.meta?.type !== 'F')" :index="link.path">
         <template #title>
-          <el-icon><component :is="link.meta?.icon || (link as any).icon" /></el-icon>
-          <span>{{ link.name }}</span>
+          <el-icon><component :is="link.meta?.metaIcon || (link as any).icon" /></el-icon>
+          <span>{{ link.meta?.metaTitle }}</span>
         </template>
         <SidebarMenuLinks :links="link.children || []" />
       </el-sub-menu>
       <el-menu-item v-else-if="link.meta?.type === 'C'" :index="link.path">
-        <el-icon><component :is="link.meta?.icon || (link as any).icon" /></el-icon>
+        <el-icon><component :is="link.meta?.metaIcon || (link as any).icon" /></el-icon>
         <template #title>
-          <span>{{ link.name }}</span>
+          <span>{{ link.meta?.metaTitle }}</span>
         </template>
       </el-menu-item>
     </template>

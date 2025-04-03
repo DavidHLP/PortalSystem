@@ -9,6 +9,7 @@ import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
 import com.david.hlp.Spring.repeater.module.entity.RoleUrl;
 import com.david.hlp.Spring.repeater.service.impl.RoleUrlServiceImpl;
+import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,5 +40,15 @@ public class RoleUrlController {
     public Result<Void> delete(@RequestBody RoleUrl roleUrl) {
         roleUrlService.deleteRoleUrl(roleUrl);
         return Result.success("删除成功");
+    }
+
+        /**
+     * 获取角色列表
+     *
+     * @return 角色列表
+     */
+    @PostMapping("/getRoleList")
+    public Result<List<RoleUrl>> getRoleList() {
+        return Result.success(roleUrlService.getRoleList());
     }
 }

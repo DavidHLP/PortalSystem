@@ -115,4 +115,35 @@
             gmt_modified = NOW()
         WHERE id = #{id} AND is_deleted = 0
     </update>
+
+    <!-- insertUserRole -->
+
+    <insert id="insertUserRole" parameterType="com.david.hlp.Spring.repeater.module.entity.UserRole">
+        INSERT INTO user_role_url (user_id, role_id)
+        VALUES (#{userId}, #{roleId})
+    </insert>
+
+    <!-- deleteUserRole -->
+
+    <delete id="deleteUserRole">
+        DELETE FROM user_role_url
+        WHERE user_id = #{userId} AND role_id = #{roleId}
+    </delete>
+
+    <!-- updateUserRole --> 
+
+    <update id="updateUserRole">
+        UPDATE user_role_url
+        SET role_id = #{roleId}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- getRoleList --> 
+
+    <select id="getRoleList" resultMap="BaseResultMap">
+        SELECT
+        ru.id, ru.role_name
+        FROM role_url ru
+        WHERE ru.is_deleted = 0
+    </select>
 </mapper>

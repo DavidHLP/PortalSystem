@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.repeater.module.entity.RoleUrl;
-
+import com.david.hlp.Spring.repeater.module.entity.UserRole;
 @Mapper
 public interface RoleUrlMapper {
     /**
@@ -16,7 +16,7 @@ public interface RoleUrlMapper {
      * @return 记录数
      */
     long countRoleUrl(RoleUrl roleUrl);
-    
+
     /**
      * 分页查询角色URL列表
      *
@@ -24,7 +24,7 @@ public interface RoleUrlMapper {
      * @return 角色URL列表
      */
     List<RoleUrl> listRoleUrl(PageInfo<RoleUrl> pageInfo);
-    
+
     /**
      * 新增角色URL
      *
@@ -32,7 +32,7 @@ public interface RoleUrlMapper {
      * @return 影响行数
      */
     int insertRoleUrl(RoleUrl roleUrl);
-    
+
     /**
      * 更新角色URL
      *
@@ -40,7 +40,7 @@ public interface RoleUrlMapper {
      * @return 影响行数
      */
     int updateRoleUrl(RoleUrl roleUrl);
-    
+
     /**
      * 删除角色URL
      *
@@ -48,4 +48,33 @@ public interface RoleUrlMapper {
      * @return 影响行数
      */
     int deleteRoleUrl(RoleUrl roleUrl);
+
+    /**
+     * 插入用户角色项目关联信息
+     *
+     * @param userRole 用户角色项目关联信息
+     */
+    void insertUserRole(UserRole userRole);
+
+    /**
+     * 删除用户角色项目关联信息
+     *
+     * @param userRole 用户角色项目关联信息
+     */
+    void deleteUserRole(UserRole userRole);
+
+
+    /**
+     * 更新用户角色项目关联信息
+     *
+     * @param userRole 用户角色项目关联信息
+     */
+    void updateUserRole(UserRole userRole);
+
+    /**
+     * 获取角色列表
+     *
+     * @return 角色列表
+     */
+    List<RoleUrl> getRoleList();
 }

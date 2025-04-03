@@ -22,8 +22,6 @@ spring:
       connection-timeout: 30000 # 连接超时时间（毫秒）
       idle-timeout: 600000      # 空闲连接存活时间（毫秒）
       max-lifetime: 1800000     # 最大连接存活时间（毫秒）
-  jpa:
-    enabled: false
 
   data:
     redis:
@@ -38,7 +36,6 @@ spring:
           max-wait: -1    # 最大阻塞等待时间(负数表示无限制)
           max-idle: 5     # 最大空闲连接数
           min-idle: 0     # 最小空闲连接数
-
 application:
   security:
     jwt:
@@ -51,7 +48,7 @@ server:
   error:
     whitelabel:
       enabled: false # 禁用 Spring 默认错误页面
-  port: 8080
+  port: 8083
 
 logging:
   level:
@@ -70,15 +67,5 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
     map-underscore-to-camel-case: true
-    type-enums-package: com.david.hlp.Spring.system.token
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: com.david.hlp.Spring.system,com.david.hlp.Spring.repeater.entity
-  scanner:
-    mapper-packages: com.david.hlp.Spring.system.mapper,com.david.hlp.Spring.repeater.mapper
-#  typeAliasesPackage: com.david.hlp.Spring.user # 指定实体类所在包
-
-file:
-  upload:
-  upload-dir: /home/david/Project/Spring/src/main/java/com/david/hlp/Spring/download/upload/
-  http: '127.0.0.1:8080'
-  url-address: '/uploads/'

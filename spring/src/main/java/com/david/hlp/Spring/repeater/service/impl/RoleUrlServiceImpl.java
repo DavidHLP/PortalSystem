@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import com.david.hlp.Spring.repeater.mapper.RoleUrlMapper;
 import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.repeater.module.entity.RoleUrl;
-
+import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -55,5 +55,14 @@ public class RoleUrlServiceImpl {
      */
     public void deleteRoleUrl(RoleUrl roleUrl) {
         roleUrlMapper.deleteRoleUrl(roleUrl);
+    }
+
+    /**
+     * 获取角色列表
+     *
+     * @return 角色列表
+     */
+    public List<RoleUrl> getRoleList() {
+        return roleUrlMapper.getRoleList();
     }
 }

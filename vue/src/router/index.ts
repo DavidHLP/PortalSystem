@@ -56,7 +56,9 @@ export function transformRoutes(backendRoutes: Router[]): RouteRecordRaw[] {
       redirect: route.redirect || undefined,
       meta: {
         ...route.meta,
-        permission: route.permission
+        permission: route.permission,
+        metaIcon: route.icon,
+        name: route.name
       },
       children: route.children && route.children.length > 0
         ? transformRoutes(route.children)

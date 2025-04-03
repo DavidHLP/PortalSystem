@@ -4,20 +4,10 @@
     <el-card class="search-form-container">
       <el-form :model="queryParams" ref="queryForm" :inline="true">
         <el-form-item label="主机地址" prop="host">
-          <el-input
-            v-model="queryParams.host"
-            placeholder="请输入主机地址"
-            clearable
-            @keyup.enter="handleQuery"
-          />
+          <el-input v-model="queryParams.host" placeholder="请输入主机地址" clearable @keyup.enter="handleQuery" />
         </el-form-item>
         <el-form-item label="路由路径" prop="router">
-          <el-input
-            v-model="queryParams.router"
-            placeholder="请输入路由路径"
-            clearable
-            @keyup.enter="handleQuery"
-          />
+          <el-input v-model="queryParams.router" placeholder="请输入路由路径" clearable @keyup.enter="handleQuery" />
         </el-form-item>
         <el-form-item label="协议类型" prop="protocol">
           <el-select v-model="queryParams.protocol" placeholder="请选择协议类型" clearable>
@@ -35,10 +25,14 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleQuery">
-            <el-icon><Search /></el-icon> 搜索
+            <el-icon>
+              <Search />
+            </el-icon> 搜索
           </el-button>
           <el-button @click="resetQuery">
-            <el-icon><Refresh /></el-icon> 重置
+            <el-icon>
+              <Refresh />
+            </el-icon> 重置
           </el-button>
         </el-form-item>
       </el-form>
@@ -49,74 +43,44 @@
       <template #header>
         <div class="card-header">
           <span class="card-title">路由URL列表</span>
-          <el-button
-            type="primary"
-            @click="handleAdd"
-          >
-            <el-icon><Plus /></el-icon> 新增
+          <el-button type="primary" @click="handleAdd">
+            <el-icon>
+              <Plus />
+            </el-icon> 新增
           </el-button>
         </div>
       </template>
 
       <!-- 表格数据 -->
-      <el-table
-        v-loading="loading"
-        :data="routerUrlList"
-        border
-        stripe
-      >
-        <el-table-column
-          label="序号"
-          type="index"
-          width="60"
-          align="center"
-        />
-        <el-table-column
-          label="主机地址"
-          prop="host"
-          min-width="120"
-          :show-overflow-tooltip="true"
-        />
-        <el-table-column
-          label="端口号"
-          prop="port"
-          width="100"
-          align="center"
-        />
-        <el-table-column
-          label="路由路径"
-          prop="router"
-          min-width="150"
-          :show-overflow-tooltip="true"
-        />
-        <el-table-column
-          label="协议类型"
-          prop="protocol"
-          width="100"
-          align="center"
-        />
-        <el-table-column
-          label="唯一标识"
-          prop="uniqueId"
-          min-width="120"
-          :show-overflow-tooltip="true"
-        />
-        <el-table-column
-          label="路由类型"
-          prop="type"
-          width="100"
-          align="center"
-        >
+      <el-table v-loading="loading" :data="routerUrlList" border stripe>
+        <el-table-column label="序号" type="index" width="60" align="center" />
+        <el-table-column label="完整URL" min-width="320" :show-overflow-tooltip="true">
+          <template #default="scope">
+            <div class="url-display">
+              <el-tag size="small" :type="getProtocolTagType(scope.row.protocol) || undefined" effect="dark"
+                class="protocol-tag">
+                {{ scope.row.protocol }}
+              </el-tag>
+              <span class="url-text">{{ getFormattedUrl(scope.row) }}
+                <el-tooltip content="复制URL" placement="top">
+                  <el-button type="primary" size="small" circle @click="copyUrl(scope.row)">
+                    <el-icon>
+                      <DocumentCopy />
+                    </el-icon>
+                  </el-button>
+                </el-tooltip>
+              </span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="协议类型" prop="protocol" width="120" align="center" />
+        <el-table-column label="唯一标识" prop="uniqueId" width="120" :show-overflow-tooltip="true" />
+        <el-table-column label="路由类型" prop="type" width="120" align="center">
           <template #default="scope">
             {{ scope.row.type === 0 ? '内部' : '外部' }}
           </template>
         </el-table-column>
-        <el-table-column
-          label="文档说明"
-          prop="doc"
-          min-width="220"
-          :show-overflow-tooltip="false"
-        >
+        <el-table-column label="文档说明" prop="doc" min-width="220" :show-overflow-tooltip="false">
           <template #default="scope">
             <div class="doc-preview">
               {{ truncateDoc(scope.row.doc) }}
@@ -126,79 +90,41 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column
-          label="创建时间"
-          prop="gmtCreate"
-          min-width="160"
-          align="center"
-        >
+        <!-- <el-table-column label="创建时间" prop="gmtCreate" min-width="160" align="center">
           <template #default="scope">
             {{ formatDateTime(scope.row.gmtCreate) }}
           </template>
         </el-table-column>
-        <el-table-column
-          label="修改时间"
-          prop="gmtModified"
-          min-width="160"
-          align="center"
-        >
+        <el-table-column label="修改时间" prop="gmtModified" min-width="160" align="center">
           <template #default="scope">
             {{ formatDateTime(scope.row.gmtModified) }}
           </template>
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          fixed="right"
-          width="180"
-          align="center"
-        >
+        </el-table-column> -->
+        <el-table-column label="操作" fixed="right" width="180" align="center">
           <template #default="scope">
-            <el-button
-              type="primary"
-              link
-              @click="handleEdit(scope.row)"
-            >
-              编辑
-            </el-button>
-            <el-button
-              type="danger"
-              link
-              @click="handleDelete(scope.row)"
-            >
-              删除
-            </el-button>
+            <div class="action-buttons">
+              <el-button type="primary" size="small" @click="handleEdit(scope.row)">
+                编辑
+              </el-button>
+              <el-button type="danger" size="small" @click="handleDelete(scope.row)">
+                删除
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
 
       <!-- 分页组件 -->
-      <el-pagination
-        class="pagination"
-        v-model:current-page="pageInfo.pageNum"
-        v-model:page-size="pageInfo.pageSize"
-        :page-sizes="[10, 20, 50, 100]"
-        :total="pageInfo.total"
-        layout="total, sizes, prev, pager, next, jumper"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+      <el-pagination class="pagination" v-model:current-page="pageInfo.pageNum" v-model:page-size="pageInfo.pageSize"
+        :page-sizes="[10, 20, 50, 100]" :total="pageInfo.total" layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </el-card>
 
     <!-- 路由URL编辑组件 -->
-    <RouterUrlComponents
-      ref="routerUrlFormRef"
-      :router-url="editRouterUrl"
-      @success="getRouterUrlList"
-    />
+    <RouterUrlComponents ref="routerUrlFormRef" :router-url="editRouterUrl" @success="getRouterUrlList" />
 
     <!-- Markdown文档查看抽屉 -->
-    <el-drawer
-      v-model="docDrawerVisible"
-      title="文档详情"
-      size="70%"
-      direction="rtl"
-      destroy-on-close
-    >
+    <el-drawer v-model="docDrawerVisible" title="文档详情" size="70%" direction="rtl" destroy-on-close>
       <MarkdownView :content="currentDoc" :theme="'light'" />
     </el-drawer>
   </div>
@@ -207,7 +133,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, Plus } from '@element-plus/icons-vue'
+import { Search, Refresh, Plus, DocumentCopy, Link } from '@element-plus/icons-vue'
 import type { RouterUrl } from '@/types/repeater/routerurl'
 import type { PageInfo } from '@/types/common'
 import { listRouterUrl, deleteRouterUrl } from '@/api/repeater/routerurl'
@@ -407,6 +333,80 @@ const viewFullDoc = (doc: string) => {
   docDrawerVisible.value = true;
 }
 
+/**
+ * 获取格式化后的URL（不含协议部分）
+ * @param row 路由URL数据
+ * @returns 格式化后的URL字符串
+ */
+const getFormattedUrl = (row: RouterUrl): string => {
+  const host = row.host || '';
+  const port = row.port ? `:${row.port}` : '';
+  const router = row.router || '';
+
+  return `${host}${port}${router}`;
+}
+
+/**
+ * 获取完整URL
+ * @param row 路由URL数据
+ * @returns 完整URL字符串
+ */
+const getFullUrl = (row: RouterUrl): string => {
+  const protocol = row.protocol?.toLowerCase() || '';
+  return `${protocol}://${getFormattedUrl(row)}`;
+}
+
+/**
+ * 获取协议标签类型
+ * @param protocol 协议类型
+ * @returns Element Plus Tag类型
+ */
+const getProtocolTagType = (protocol: string): '' | 'success' | 'warning' | 'danger' | 'info' => {
+  switch (protocol) {
+    case 'HTTP': return 'info';
+    case 'HTTPS': return 'success';
+    case 'TCP': return 'warning';
+    case 'UDP': return 'danger';
+    default: return '';
+  }
+}
+
+/**
+ * 判断是否为Web协议
+ * @param protocol 协议类型
+ * @returns 是否为Web协议
+ */
+const isWebProtocol = (protocol: string): boolean => {
+  return protocol === 'HTTP' || protocol === 'HTTPS';
+}
+
+/**
+ * 复制URL到剪贴板
+ * @param row 路由URL数据
+ */
+const copyUrl = (row: RouterUrl) => {
+  const url = getFullUrl(row);
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      ElMessage.success('URL已复制到剪贴板');
+    })
+    .catch(err => {
+      console.error('复制失败', err);
+      ElMessage.error('复制失败，请手动复制');
+    });
+}
+
+/**
+ * 在新标签页中打开URL
+ * @param row 路由URL数据
+ */
+const openUrl = (row: RouterUrl) => {
+  if (isWebProtocol(row.protocol)) {
+    const url = getFullUrl(row);
+    window.open(url, '_blank');
+  }
+}
+
 // 组件挂载时获取数据
 onMounted(() => {
   getRouterUrlList()
@@ -424,6 +424,17 @@ onMounted(() => {
 
 .table-container {
   margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+
+  :deep(.el-table) {
+    --el-table-border-color: var(--el-border-color-lighter);
+    --el-table-header-bg-color: var(--el-fill-color-light);
+
+    th {
+      font-weight: bold;
+    }
+  }
 }
 
 .card-header {
@@ -446,6 +457,36 @@ onMounted(() => {
 .doc-preview {
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+
+.url-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.protocol-tag {
+  min-width: 60px;
+  text-align: center;
+}
+
+.url-text {
+  font-family: monospace;
+  color: var(--el-color-primary-light-3);
+  flex: 1;
+  word-break: break-all;
+}
+
+.url-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
   gap: 8px;
 }
 </style>
