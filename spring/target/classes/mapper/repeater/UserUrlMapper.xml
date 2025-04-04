@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.david.hlp.Spring.repeater.mapper.UserUrlMapper">
+
+    <!-- 通用查询语句片段 -->
+    <sql id="Base_Column_List">
+        user_url.id as id, username, email, `status`, role_name, role_url.id as role_id,
+        project.id as project_id, project.project_name as project_name,
+        project.doc as project_doc, role_url.doc as role_doc
+    </sql>
+
+    <!-- 通用WHERE条件片段 -->
+    <sql id="Base_Where_Clause">
+        user_url.is_deleted = 0 AND user_role_url.is_deleted = 0 AND user_url.`status` = 0 AND project.is_deleted = 0
+        <if test="userRoleProject != null">
+            <if test="userRoleProject.username != null and userRoleProject.username != ''">
+                AND username LIKE CONCAT('%', #{userRoleProject.username}, '%')
+            </if>
+            <if test="userRoleProject.email != null and userRoleProject.email != ''">
+                AND email LIKE CONCAT('%', #{userRoleProject.email}, '%')
+            </if>
+            <if test="userRoleProject.roleName != null and userRoleProject.roleName != ''">
+                AND role_name LIKE CONCAT('%', #{userRoleProject.roleName}, '%')
+            </if>
+            <if test="userRoleProject.projectName != null and userRoleProject.projectName != ''">
+                AND project.project_name LIKE CONCAT('%', #{userRoleProject.projectName}, '%')
+            </if>
+        </if>
+    </sql>
+
+    <!-- 分页查询用户角色项目关联信息 -->
+    <select id="listUserRoleProject" resultType="com.david.hlp.Spring.repeater.module.entity.UserRoleProject">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM user_url
+        left join user_role_url on user_role_url.user_id = user_url.id
+        left join role_url on role_url.id = user_role_url.role_id
+        left join project on project.id = role_url.project_id
+        WHERE
+        <include refid="Base_Where_Clause" />
+        ORDER BY user_url.id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 查询用户角色项目关联信息总数 -->
+    <select id="countUserRoleProject" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT user_url.id)
+        FROM user_url
+        left join user_role_url on user_role_url.user_id = user_url.id
+        left join role_url on role_url.id = user_role_url.role_id
+        left join project on project.id = role_url.project_id
+        WHERE
+        <include refid="Base_Where_Clause" />
+    </select>
+
+    <!-- insertUserRoleProject -->
+
+    <insert id="insertUserRoleProject" parameterType="com.david.hlp.Spring.repeater.module.dto.UserRoleProjectDTO">
+        INSERT INTO user_url (username, email, password, `status`)
+        VALUES (#{userRoleProject.username}, #{userRoleProject.email}, #{userRoleProject.password}, #{userRoleProject.status})
+    </insert>
+
+    <!-- deleteUser -->
+
+    <delete id="deleteUser" parameterType="java.lang.Long">
+        DELETE FROM user_url
+        WHERE id = #{id}
+    </delete>
+
+    <!-- updateUser -->
+
+    <update id="updateUser" parameterType="com.david.hlp.Spring.repeater.module.entity.UserRoleProject">
+        UPDATE user_url
+        SET username = #{userRoleProject.username}, email = #{userRoleProject.email} , `status` = #{userRoleProject.status}
+        WHERE id = #{userRoleProject.id}
+    </update>
+
+    <!-- updateUserPassword -->
+
+    <update id="updateUserPassword" parameterType="com.david.hlp.Spring.repeater.module.dto.UserRoleProjectDTO">
+        UPDATE user_url
+        SET password = #{userRoleProject.password}
+        WHERE id = #{userRoleProject.id}
+    </update>
+
+    <!-- selectUserId -->
+
+    <select id="selectUserId" resultType="java.lang.Long">
+        SELECT id
+        FROM user_url
+        WHERE username = #{userRoleProject.username} AND email = #{userRoleProject.email}
+    </select>
+</mapper>

@@ -1,3 +1,5 @@
+import type { Project } from '@/types/repeater/project'
+
 export interface RouterUrl {
   id?: number
   host: string
@@ -18,4 +20,8 @@ export enum HttpMethodType {
   POST = 1,
   PUT = 2,
   DELETE = 3,
+}
+
+export interface RouterProjectDTO extends RouterUrl {
+  projects: Project[]
 }

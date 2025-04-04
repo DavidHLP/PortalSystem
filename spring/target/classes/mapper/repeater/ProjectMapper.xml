@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.david.hlp.Spring.repeater.mapper.ProjectMapper">
+
+    <resultMap id="ProjectRoleDTO" type="com.david.hlp.Spring.repeater.module.dto.ProjectRoleDTO">
+        <id property="id" column="id" />
+        <result property="projectName" column="project_name" />
+        <result property="doc" column="doc" />
+        <result property="gmtCreate" column="gmt_create" />
+        <result property="gmtModified" column="gmt_modified" />
+        <result property="isDeleted" column="is_deleted" />
+        <collection property="roleUrls" ofType="com.david.hlp.Spring.repeater.module.entity.RoleUrl">
+            <id property="id" column="role_url_id" />
+            <result property="doc" column="role_url_doc" />
+            <result property="roleName" column="role_name" />
+            <result property="isDeleted" column="role_url_is_deleted" />
+        </collection>
+    </resultMap>
+
+    <insert id="insertProject" parameterType="com.david.hlp.Spring.repeater.module.entity.Project">
+        INSERT INTO project (project_name, doc, gmt_create, gmt_modified)
+        VALUES (#{projectName}, #{doc}, NOW(), NOW())
+    </insert>
+
+    <select id="listProject" resultMap="ProjectRoleDTO">
+        SELECT
+            project.id,
+            project.project_name,
+            project.doc,
+            project.gmt_create,
+            project.gmt_modified,
+            project.is_deleted,
+            role_url.id as role_url_id,
+            role_url.doc as role_url_doc,
+            role_url.role_name as role_name,
+            role_url.is_deleted as role_url_is_deleted
+        FROM project
+        LEFT JOIN role_url ON role_url.project_id = project.id
+        <where>
+            <if test="project != null">
+                <if test="project.projectName != null and project.projectName != ''">
+                    AND project.project_name LIKE CONCAT('%', #{project.projectName}, '%')
+                </if>
+                <if test="project.isDeleted != null">
+                    AND project.is_deleted = #{project.isDeleted}
+                </if>
+            </if>
+            AND (project.is_deleted = 0 OR project.is_deleted IS NULL)
+        </where>
+        ORDER BY project.gmt_create DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countProject" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT project.id)
+        FROM project
+        LEFT JOIN role_url ON role_url.project_id = project.id
+        <where>
+            <if test="project != null">
+                <if test="project.projectName != null and project.projectName != ''">
+                    AND project.project_name LIKE CONCAT('%', #{project.projectName}, '%')
+                </if>
+                <if test="project.isDeleted != null">
+                    AND project.is_deleted = #{project.isDeleted}
+                </if>
+            </if>
+            AND (project.is_deleted = 0 OR project.is_deleted IS NULL)
+        </where>
+    </select>
+
+    <update id="updateProject" parameterType="com.david.hlp.Spring.repeater.module.entity.Project">
+        UPDATE project
+        <set>
+            <if test="projectName != null and projectName != ''">
+                project_name = #{projectName},
+            </if>
+            <if test="doc != null">
+                doc = #{doc},
+            </if>
+            gmt_modified = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- deleteProject -->
+
+    <delete id="deleteProject">
+        UPDATE project
+        SET is_deleted = 1
+        WHERE id = #{id}
+    </delete>
+
+    <!-- listAllProject -->
+
+    <select id="listAllProject" resultType="com.david.hlp.Spring.repeater.module.entity.Project">
+        SELECT id, project_name, doc, gmt_create, gmt_modified, is_deleted
+        FROM project
+        WHERE is_deleted = 0
+    </select>
+</mapper>

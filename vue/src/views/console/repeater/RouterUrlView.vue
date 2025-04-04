@@ -10,7 +10,7 @@
           <el-input v-model="queryParams.router" placeholder="请输入路由路径" clearable @keyup.enter="handleQuery" />
         </el-form-item>
         <el-form-item label="协议类型" prop="protocol">
-          <el-select v-model="queryParams.protocol" placeholder="请选择协议类型" clearable>
+          <el-select v-model="queryParams.protocol" placeholder="请选择协议类型" clearable style="width: 100px;">
             <el-option label="HTTP" value="HTTP" />
             <el-option label="HTTPS" value="HTTPS" />
             <el-option label="TCP" value="TCP" />
@@ -18,7 +18,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="HTTP方法" prop="httpMethod" v-if="isWebProtocolQuery">
-          <el-select v-model="queryParams.httpMethod" placeholder="请选择HTTP方法" clearable>
+          <el-select v-model="queryParams.httpMethod" placeholder="请选择HTTP方法" clearable style="width: 100px;">
             <el-option label="GET" :value="0" />
             <el-option label="POST" :value="1" />
             <el-option label="PUT" :value="2" />
@@ -26,7 +26,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="路由类型" prop="type">
-          <el-select v-model="queryParams.type" placeholder="请选择路由类型" clearable>
+          <el-select v-model="queryParams.type" placeholder="请选择路由类型" clearable style="width: 100px;">
             <el-option label="内部" :value="0" />
             <el-option label="外部" :value="1" />
           </el-select>
@@ -95,6 +95,33 @@
             {{ scope.row.type === 0 ? '内部' : '外部' }}
           </template>
         </el-table-column>
+        <el-table-column label="关联项目" min-width="180" :show-overflow-tooltip="true">
+          <template #default="scope">
+            <div class="projects-tags">
+              <template v-if="scope.row.projects && scope.row.projects.length > 0">
+                <el-tag
+                  v-for="(project, index) in scope.row.projects.slice(0, 3)"
+                  :key="index"
+                  size="small"
+                  type="success"
+                  class="project-tag"
+                  :effect="index % 2 === 0 ? 'light' : 'plain'"
+                >
+                  {{ project.projectName }}
+                </el-tag>
+                <el-tag
+                  v-if="scope.row.projects.length > 3"
+                  size="small"
+                  type="info"
+                  class="more-tag"
+                >
+                  +{{ scope.row.projects.length - 3 }}
+                </el-tag>
+              </template>
+              <span v-else class="no-project">暂无关联项目</span>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="文档说明" prop="doc" min-width="220" :show-overflow-tooltip="false">
           <template #default="scope">
             <div class="doc-preview">
@@ -138,8 +165,8 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, Plus, DocumentCopy, Link } from '@element-plus/icons-vue'
-import type { RouterUrl } from '@/types/repeater/routerurl'
+import { Search, Refresh, Plus, DocumentCopy } from '@element-plus/icons-vue'
+import type { RouterProjectDTO } from '@/types/repeater/routerurl'
 import { HttpMethodType } from '@/types/repeater/routerurl'
 import type { PageInfo } from '@/types/common'
 import { listRouterUrl, deleteRouterUrl } from '@/api/repeater/routerurl'
@@ -169,26 +196,26 @@ const formatDateTime = (time: string | number | Date): string => {
 // 加载状态
 const loading = ref(false)
 // 路由URL列表
-const routerUrlList = ref<RouterUrl[]>([])
+const routerUrlList = ref<RouterProjectDTO[]>([])
 // 编辑的路由URL对象
-const editRouterUrl = ref<RouterUrl>()
+const editRouterUrl = ref<RouterProjectDTO>()
 // 路由URL表单组件引用
 const routerUrlFormRef = ref()
 
 // 分页参数
-const pageInfo = reactive<PageInfo<RouterUrl>>({
+const pageInfo = reactive<PageInfo<RouterProjectDTO>>({
   pageNum: 1,
   pageSize: 10,
   total: 0,
-  item: {} as RouterUrl
+  item: {} as RouterProjectDTO
 })
 
 // 查询参数
-const queryParams = reactive<Partial<RouterUrl>>({
+const queryParams = reactive<Partial<RouterProjectDTO>>({
   host: '',
   router: '',
   protocol: '',
-  type: undefined,
+  type: undefined as unknown as string,
   httpMethod: undefined
 })
 
@@ -259,12 +286,15 @@ const getRouterUrlList = async () => {
       host: queryParams.host || '',
       router: queryParams.router || '',
       protocol: queryParams.protocol || '',
-      type: queryParams.type || '',
+      type: queryParams.type !== undefined ? queryParams.type : '',
       port: queryParams.port || '',
       uniqueId: '',
       doc: '',
-      httpMethod: queryParams.httpMethod || undefined
+      httpMethod: queryParams.httpMethod || undefined,
+      projects: []
     }
+
+    console.log('pageInfo: ', pageInfo.item)
 
     const res = await listRouterUrl(pageInfo)
     if (res.items) {
@@ -274,8 +304,9 @@ const getRouterUrlList = async () => {
           return { ...item, httpMethod: HttpMethodType.GET };
         }
         return item;
-      }) as RouterUrl[];
+      }) as RouterProjectDTO[];
       pageInfo.total = res.total || 0
+      console.log('routerUrlList: ', routerUrlList.value)
     }
   } catch (error) {
     console.error('获取路由URL列表失败', error)
@@ -333,7 +364,8 @@ const handleAdd = () => {
     uniqueId: '',
     type: '',
     doc: '',
-    httpMethod: HttpMethodType.GET
+    httpMethod: HttpMethodType.GET,
+    projects: []
   }
   routerUrlFormRef.value.open()
 }
@@ -341,7 +373,7 @@ const handleAdd = () => {
 /**
  * 处理编辑
  */
-const handleEdit = (row: RouterUrl) => {
+const handleEdit = (row: RouterProjectDTO) => {
   editRouterUrl.value = { ...row }
   routerUrlFormRef.value.open()
 }
@@ -349,7 +381,7 @@ const handleEdit = (row: RouterUrl) => {
 /**
  * 处理删除
  */
-const handleDelete = (row: RouterUrl) => {
+const handleDelete = (row: RouterProjectDTO) => {
   ElMessageBox.confirm(
     `确认删除路由URL"${row.host}:${row.port}${row.router}"吗？`,
     '提示',
@@ -407,7 +439,7 @@ const viewFullDoc = (doc: string) => {
  * @param row 路由URL数据
  * @returns 格式化后的URL字符串
  */
-const getFormattedUrl = (row: RouterUrl): string => {
+const getFormattedUrl = (row: RouterProjectDTO): string => {
   const host = row.host || '';
   const port = row.port ? `:${row.port}` : '';
   const router = row.router || '';
@@ -420,7 +452,7 @@ const getFormattedUrl = (row: RouterUrl): string => {
  * @param row 路由URL数据
  * @returns 完整URL字符串
  */
-const getFullUrl = (row: RouterUrl): string => {
+const getFullUrl = (row: RouterProjectDTO): string => {
   const protocol = row.protocol?.toLowerCase() || '';
   return `${protocol}://${getFormattedUrl(row)}`;
 }
@@ -444,7 +476,7 @@ const getProtocolTagType = (protocol: string): '' | 'success' | 'warning' | 'dan
  * 复制URL到剪贴板
  * @param row 路由URL数据
  */
-const copyUrl = (row: RouterUrl) => {
+const copyUrl = (row: RouterProjectDTO) => {
   const url = getFullUrl(row);
   navigator.clipboard.writeText(url)
     .then(() => {
@@ -460,7 +492,7 @@ const copyUrl = (row: RouterUrl) => {
  * 在新标签页中打开URL
  * @param row 路由URL数据
  */
-const openUrl = (row: RouterUrl) => {
+const openUrl = (row: RouterProjectDTO) => {
   if (isWebProtocol(row.protocol)) {
     const url = getFullUrl(row);
     window.open(url, '_blank');
@@ -518,6 +550,27 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.projects-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.project-tag {
+  margin: 2px;
+}
+
+.more-tag {
+  margin: 2px;
+  cursor: pointer;
+}
+
+.no-project {
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+  font-style: italic;
 }
 
 .url-display {
