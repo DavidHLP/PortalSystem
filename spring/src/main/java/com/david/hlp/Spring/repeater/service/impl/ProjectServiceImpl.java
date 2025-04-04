@@ -7,7 +7,7 @@ import com.david.hlp.Spring.repeater.module.entity.Project;
 import com.david.hlp.Spring.common.result.PageInfo;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
-
+import com.david.hlp.Spring.repeater.module.dto.ProjectRoleDTO;
 @Service
 @RequiredArgsConstructor
 public class ProjectServiceImpl {
@@ -22,7 +22,7 @@ public class ProjectServiceImpl {
      * @param pageInfo 分页查询条件
      * @return 分页结果
      */
-    public PageInfo<Project> listProjectByPage(PageInfo<Project> pageInfo) {
+    public PageInfo<ProjectRoleDTO> listProjectByPage(PageInfo<ProjectRoleDTO> pageInfo) {
         Integer pageNum = pageInfo.getPageNum();
         Integer pageSize = pageInfo.getPageSize();
         // 计算偏移量
@@ -32,13 +32,13 @@ public class ProjectServiceImpl {
         Long total = projectMapper.countProject(pageInfo.getItem());
 
         // 查询数据列表
-        List<Project> projectList = projectMapper.listProject(pageInfo.getItem(), pageSize, offset);
+        List<ProjectRoleDTO> projectList = projectMapper.listProject(pageInfo.getItem(), pageSize, offset);
 
         // 计算总页数
         Integer pages = (int)Math.ceil((double)total / pageSize);
 
         // 构建返回结果
-        return PageInfo.<Project>builder()
+        return PageInfo.<ProjectRoleDTO>builder()
             .items(projectList)
             .item(pageInfo.getItem())
             .pageNum(pageNum)

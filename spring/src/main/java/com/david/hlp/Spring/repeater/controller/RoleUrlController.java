@@ -18,24 +18,24 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RoleUrlController {
     private final RoleUrlServiceImpl roleUrlService;
-    
+
     @PostMapping("/list")
     public Result<PageInfo<RoleUrl>> list(@RequestBody PageInfo<RoleUrl> pageInfo) {
         return Result.success(roleUrlService.listRoleUrlByPage(pageInfo));
     }
-    
+
     @PostMapping("/add")
     public Result<Void> add(@RequestBody RoleUrl roleUrl) {
         roleUrlService.addRoleUrl(roleUrl);
         return Result.success("添加成功");
     }
-    
+
     @PostMapping("/update")
     public Result<Void> update(@RequestBody RoleUrl roleUrl) {
         roleUrlService.updateRoleUrl(roleUrl);
         return Result.success("更新成功");
     }
-    
+
     @PostMapping("/delete")
     public Result<Void> delete(@RequestBody RoleUrl roleUrl) {
         roleUrlService.deleteRoleUrl(roleUrl);
@@ -51,4 +51,27 @@ public class RoleUrlController {
     public Result<List<RoleUrl>> getRoleList() {
         return Result.success(roleUrlService.getRoleList());
     }
+
+    /**
+     * 禁用角色URL
+     *
+     * @param id 角色URLID
+     */
+    @PostMapping("/disable")
+    public Result<Void> disable(@RequestBody RoleUrl roleUrl) {
+        roleUrlService.disableRoleUrl(roleUrl.getId());
+        return Result.success("禁用成功");
+    }
+
+    /**
+     * 启用角色URL
+     *
+     * @param id 角色URLID
+     */
+    @PostMapping("/enable")
+    public Result<Void> enable(@RequestBody RoleUrl roleUrl) {
+        roleUrlService.enableRoleUrl(roleUrl.getId());
+        return Result.success("启用成功");
+    }
+
 }

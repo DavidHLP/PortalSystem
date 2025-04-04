@@ -2,6 +2,7 @@ package com.david.hlp.Spring.repeater.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import com.david.hlp.Spring.repeater.module.entity.Project;
+import com.david.hlp.Spring.repeater.module.dto.ProjectRoleDTO;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,14 +23,14 @@ public interface ProjectMapper {
      * @param pageSize 每页条数
      * @return 项目列表
      */
-    List<Project> listProject(@Param("project") Project project, @Param("pageSize") Integer pageSize, @Param("offset") Integer offset);
+    List<ProjectRoleDTO> listProject(@Param("project") ProjectRoleDTO project, @Param("pageSize") Integer pageSize, @Param("offset") Integer offset);
 
     /**
      * 查询项目总数
      * @param project 查询条件
      * @return 总数
      */
-    Long countProject(@Param("project") Project project);
+    Long countProject(@Param("project") ProjectRoleDTO project);
 
     /**
      * 更新项目信息

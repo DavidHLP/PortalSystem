@@ -74,6 +74,7 @@ const formRef = ref<FormInstance>()
 const drawerVisible = ref(false)
 // 表单数据
 const form = reactive<RoleUrl>({
+  id: 0,
   roleName: '',
   projectId: undefined,
   doc: '',

@@ -12,13 +12,13 @@ import com.david.hlp.Spring.repeater.module.entity.RouterUrl;
 import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
 import java.util.List;
-
+import com.david.hlp.Spring.repeater.module.dto.RouterProjectDTO;
 @RestController
 @RequestMapping("/api/routerUrl")
 @RequiredArgsConstructor
 public class RouterUrlController {
     private final RouterUrlServiceImpl routerUrlService;
-    
+
     /**
      * 添加路由信息
      * @param routerUrl 路由信息
@@ -29,17 +29,18 @@ public class RouterUrlController {
         routerUrlService.addRouterUrl(routerUrl);
         return Result.success();
     }
-    
+
     /**
      * 分页查询路由信息
      * @param pageInfo 分页查询条件
      * @return 分页结果
      */
     @PostMapping("/page")
-    public Result<PageInfo<RouterUrl>> listRouterUrlByPage(@RequestBody PageInfo<RouterUrl> pageInfo) {
+    public Result<PageInfo<RouterProjectDTO>> listRouterUrlByPage(@RequestBody PageInfo<RouterProjectDTO> pageInfo) {
+        System.out.println("pageInfo: " + pageInfo.getItem().getHttpMethod());
         return Result.success(routerUrlService.listRouterUrlByPage(pageInfo));
     }
-    
+
     /**
      * 更新路由信息
      * @param routerUrl 路由信息
@@ -50,7 +51,7 @@ public class RouterUrlController {
         routerUrlService.updateRouterUrl(routerUrl);
         return Result.success();
     }
-    
+
     /**
      * 删除路由信息
      * @param routerUrl 路由信息
@@ -61,7 +62,7 @@ public class RouterUrlController {
         routerUrlService.deleteRouterUrl(routerUrl);
         return Result.success();
     }
-    
+
     /**
      * 查询所有路由信息
      * @return 所有路由信息

@@ -7,7 +7,7 @@ export interface RoleUrl {
   /**
    * 主键ID
    */
-  id?: number
+  id: number
 
   /**
    * 角色名称

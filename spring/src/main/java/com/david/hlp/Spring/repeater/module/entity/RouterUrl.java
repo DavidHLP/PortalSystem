@@ -2,10 +2,12 @@ package com.david.hlp.Spring.repeater.module.entity;
 
 import java.util.Date;
 
+import com.david.hlp.Spring.repeater.module.enums.HttpMethodType;
+
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 路由信息实体类
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class RouterUrl {
     /**
      * 主键ID
@@ -49,6 +51,11 @@ public class RouterUrl {
      * 路由类型:0-内部,1-外部
      */
     private Integer type;
+
+    /**
+     * 请求方法
+     */
+    private HttpMethodType httpMethod;
 
     /**
      * 文档说明

@@ -77,4 +77,18 @@ public interface RoleUrlMapper {
      * @return 角色列表
      */
     List<RoleUrl> getRoleList();
+
+    /**
+     * 禁用角色URL
+     *
+     * @param id 角色URLID
+     */
+    void disableRoleUrl(Long id);
+
+    /**
+     * 启用角色URL
+     *
+     * @param id 角色URLID
+     */
+    void enableRoleUrl(Long id);
 }

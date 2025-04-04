@@ -60,3 +60,19 @@ export function getRoleList(): Promise<RoleUrl[]> {
     method: 'post'
   })
 }
+
+export function disableRoleUrl(id: number): Promise<void> {
+  return request({
+    url: '/api/roleUrl/disable',
+    method: 'post',
+    data: { id: id }
+  })
+}
+
+export function enableRoleUrl(id: number): Promise<void> {
+  return request({
+    url: '/api/roleUrl/enable',
+    method: 'post',
+    data: { id: id }
+  })
+}

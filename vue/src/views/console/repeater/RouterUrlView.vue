@@ -17,6 +17,14 @@
             <el-option label="UDP" value="UDP" />
           </el-select>
         </el-form-item>
+        <el-form-item label="HTTP方法" prop="httpMethod" v-if="isWebProtocolQuery">
+          <el-select v-model="queryParams.httpMethod" placeholder="请选择HTTP方法" clearable>
+            <el-option label="GET" :value="0" />
+            <el-option label="POST" :value="1" />
+            <el-option label="PUT" :value="2" />
+            <el-option label="DELETE" :value="3" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="路由类型" prop="type">
           <el-select v-model="queryParams.type" placeholder="请选择路由类型" clearable>
             <el-option label="内部" :value="0" />
@@ -74,6 +82,13 @@
           </template>
         </el-table-column>
         <el-table-column label="协议类型" prop="protocol" width="120" align="center" />
+        <el-table-column label="HTTP方法" prop="httpMethod" width="120" align="center" v-if="hasHttpMethodColumn">
+          <template #default="scope">
+            <el-tag v-if="isWebProtocol(scope.row.protocol)" :type="getHttpMethodTagType(scope.row.httpMethod || HttpMethodType.GET) as any">
+              {{ scope.row.httpMethod || HttpMethodType.GET }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="唯一标识" prop="uniqueId" width="120" :show-overflow-tooltip="true" />
         <el-table-column label="路由类型" prop="type" width="120" align="center">
           <template #default="scope">
@@ -90,16 +105,6 @@
             </div>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="创建时间" prop="gmtCreate" min-width="160" align="center">
-          <template #default="scope">
-            {{ formatDateTime(scope.row.gmtCreate) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="修改时间" prop="gmtModified" min-width="160" align="center">
-          <template #default="scope">
-            {{ formatDateTime(scope.row.gmtModified) }}
-          </template>
-        </el-table-column> -->
         <el-table-column label="操作" fixed="right" width="180" align="center">
           <template #default="scope">
             <div class="action-buttons">
@@ -131,10 +136,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus, DocumentCopy, Link } from '@element-plus/icons-vue'
 import type { RouterUrl } from '@/types/repeater/routerurl'
+import { HttpMethodType } from '@/types/repeater/routerurl'
 import type { PageInfo } from '@/types/common'
 import { listRouterUrl, deleteRouterUrl } from '@/api/repeater/routerurl'
 import RouterUrlComponents from '@/components/repeater/RouterUrlComponents.vue'
@@ -182,12 +188,65 @@ const queryParams = reactive<Partial<RouterUrl>>({
   host: '',
   router: '',
   protocol: '',
-  type: undefined
+  type: undefined,
+  httpMethod: undefined
 })
 
 // 文档相关
 const docDrawerVisible = ref(false)
 const currentDoc = ref('')
+
+// 判断是否显示HTTP方法查询选项
+const isWebProtocolQuery = computed(() => {
+  return queryParams.protocol === 'HTTP' || queryParams.protocol === 'HTTPS' || !queryParams.protocol;
+})
+
+// 判断是否显示HTTP方法列
+const hasHttpMethodColumn = computed(() => {
+  return routerUrlList.value.some(item => isWebProtocol(item.protocol));
+})
+
+/**
+ * 判断是否为Web协议
+ * @param protocol 协议类型
+ * @returns 是否为Web协议
+ */
+const isWebProtocol = (protocol: string): boolean => {
+  return protocol === 'HTTP' || protocol === 'HTTPS';
+}
+
+/**
+ * 获取HTTP方法名称
+ * @param method HTTP方法类型
+ * @returns HTTP方法名称
+ */
+const getHttpMethodName = (method: HttpMethodType | undefined): string => {
+  if (method === undefined) {
+    return '';
+  }
+  switch (method) {
+    case HttpMethodType.GET: return 'GET';
+    case HttpMethodType.POST: return 'POST';
+    case HttpMethodType.PUT: return 'PUT';
+    case HttpMethodType.DELETE: return 'DELETE';
+    default: return '';
+  }
+}
+
+/**
+ * 获取HTTP方法标签类型
+ * @param method HTTP方法类型
+ * @returns Element Plus Tag类型
+ */
+const getHttpMethodTagType = (method: String): 'success' | 'warning' | 'danger' | 'info' | 'primary' => {
+  switch (method) {
+    case 'GET': return 'success';
+    case 'POST': return 'primary';
+    case 'PUT': return 'warning';
+    case 'DELETE': return 'danger';
+    default: return 'info';
+  }
+}
 
 /**
  * 获取路由URL列表
@@ -203,12 +262,19 @@ const getRouterUrlList = async () => {
       type: queryParams.type || '',
       port: queryParams.port || '',
       uniqueId: '',
-      doc: ''
+      doc: '',
+      httpMethod: queryParams.httpMethod || undefined
     }
 
     const res = await listRouterUrl(pageInfo)
     if (res.items) {
-      routerUrlList.value = (res.items || []) as RouterUrl[]
+      // 确保HTTP方法有默认值
+      routerUrlList.value = (res.items || []).map(item => {
+        if (isWebProtocol(item.protocol) && item.httpMethod === undefined) {
+          return { ...item, httpMethod: HttpMethodType.GET };
+        }
+        return item;
+      }) as RouterUrl[];
       pageInfo.total = res.total || 0
     }
   } catch (error) {
@@ -235,6 +301,7 @@ const resetQuery = () => {
   queryParams.router = ''
   queryParams.protocol = ''
   queryParams.type = undefined
+  queryParams.httpMethod = undefined
   handleQuery()
 }
 
@@ -265,7 +332,8 @@ const handleAdd = () => {
     protocol: 'HTTP',
     uniqueId: '',
     type: '',
-    doc: ''
+    doc: '',
+    httpMethod: HttpMethodType.GET
   }
   routerUrlFormRef.value.open()
 }
@@ -300,7 +368,8 @@ const handleDelete = (row: RouterUrl) => {
         protocol: row.protocol,
         uniqueId: row.uniqueId,
         type: row.type,
-        doc: row.doc
+        doc: row.doc,
+        httpMethod: row.httpMethod
       })
       ElMessage.success('删除成功')
       getRouterUrlList()
@@ -369,15 +438,6 @@ const getProtocolTagType = (protocol: string): '' | 'success' | 'warning' | 'dan
     case 'UDP': return 'danger';
     default: return '';
   }
-}
-
-/**
- * 判断是否为Web协议
- * @param protocol 协议类型
- * @returns 是否为Web协议
- */
-const isWebProtocol = (protocol: string): boolean => {
-  return protocol === 'HTTP' || protocol === 'HTTPS';
 }
 
 /**

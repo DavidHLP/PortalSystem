@@ -7,7 +7,7 @@ import com.david.hlp.Spring.repeater.mapper.RouterUrlMapper;
 import com.david.hlp.Spring.repeater.module.entity.RouterUrl;
 import com.david.hlp.Spring.common.result.PageInfo;
 import java.util.List;
-
+import com.david.hlp.Spring.repeater.module.dto.RouterProjectDTO;
 @Service
 @RequiredArgsConstructor
 public class RouterUrlServiceImpl {
@@ -26,23 +26,23 @@ public class RouterUrlServiceImpl {
      * @param pageInfo 分页查询条件
      * @return 分页结果
      */
-    public PageInfo<RouterUrl> listRouterUrlByPage(PageInfo<RouterUrl> pageInfo) {
+    public PageInfo<RouterProjectDTO> listRouterUrlByPage(PageInfo<RouterProjectDTO> pageInfo) {
         Integer pageNum = pageInfo.getPageNum();
         Integer pageSize = pageInfo.getPageSize();
         // 计算偏移量
         Integer offset = pageSize * (pageNum - 1);
-        
+
         // 查询总数
         Long total = routerUrlMapper.countRouterUrl(pageInfo.getItem());
-        
+
         // 查询数据列表
-        List<RouterUrl> routerUrlList = routerUrlMapper.listRouterUrl(pageInfo.getItem(), pageSize, offset);
-        
+        List<RouterProjectDTO> routerUrlList = routerUrlMapper.listRouterUrl(pageInfo.getItem(), pageSize, offset);
+
         // 计算总页数
         Integer pages = (int)Math.ceil((double)total / pageSize);
-        
+
         // 构建返回结果
-        return PageInfo.<RouterUrl>builder()
+        return PageInfo.<RouterProjectDTO>builder()
             .items(routerUrlList)
             .item(pageInfo.getItem())
             .pageNum(pageNum)
@@ -51,7 +51,7 @@ public class RouterUrlServiceImpl {
             .pages(pages)
             .build();
     }
-    
+
     /**
      * 更新路由信息
      * @param routerUrl 路由信息

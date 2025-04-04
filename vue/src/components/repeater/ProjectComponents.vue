@@ -15,17 +15,62 @@
       label-width="80px"
       class="drawer-form"
     >
-      <el-form-item label="项目名称" prop="projectName">
-        <el-input v-model="form.projectName" placeholder="请输入项目名称" />
-      </el-form-item>
-      <el-form-item label="文档说明" prop="doc">
-        <md-editor-element
-          v-model="form.doc"
-          :height="300"
-          :min-height="200"
-          placeholder="请输入项目文档说明"
-        />
-      </el-form-item>
+      <!-- 基本信息区域 -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3>基本信息</h3>
+        </div>
+        <el-form-item label="项目名称" prop="projectName">
+          <el-input v-model="form.projectName" placeholder="请输入项目名称" />
+        </el-form-item>
+        <el-form-item label="文档说明" prop="doc">
+          <md-editor-element
+            v-model="form.doc"
+            :height="300"
+            :min-height="200"
+            placeholder="请输入项目文档说明"
+          />
+        </el-form-item>
+      </div>
+
+      <!-- 角色管理区域，仅在编辑模式下显示 -->
+      <div v-if="form.id && form.roleUrls && form.roleUrls.length > 0" class="form-section">
+        <div class="section-header">
+          <h3>角色管理</h3>
+        </div>
+        <el-table :data="form.roleUrls" border class="role-table">
+          <el-table-column prop="id" label="角色ID" width="80" />
+          <el-table-column prop="roleName" label="角色名称" />
+          <el-table-column label="状态" width="100">
+            <template #default="scope">
+              <el-tag :type="scope.row.isDeleted === 1 ? 'danger' : 'success'">
+                {{ scope.row.isDeleted === 1 ? '已禁用' : '已启用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="150">
+            <template #default="scope">
+              <el-button
+                v-if="scope.row.isDeleted === 0"
+                type="danger"
+                link
+                @click="handleDisableRole(scope.row)"
+              >
+                禁用
+              </el-button>
+              <el-button
+                v-if="scope.row.isDeleted === 1"
+                type="success"
+                link
+                @click="handleEnableRole(scope.row)"
+              >
+                启用
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
       <div class="drawer-footer">
         <el-button @click="cancel">取消</el-button>
         <el-button type="primary" @click="submitForm">确定</el-button>
@@ -36,10 +81,12 @@
 
 <script lang="ts" setup>
 import { ref, reactive, computed, watchEffect } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance } from 'element-plus'
-import type { Project } from '@/types/repeater/project'
+import type { ProjectRoleDTO } from '@/types/repeater/project'
+import type { RoleUrl } from '@/types/repeater/roleurl'
 import { addProject, updateProject } from '@/api/repeater/project'
+import { disableRoleUrl, enableRoleUrl } from '@/api/repeater/roleurl'
 import MdEditorElement from '@/components/markdown/MdEditorElement.vue'
 
 // 表单引用
@@ -47,10 +94,11 @@ const formRef = ref<FormInstance>()
 // 对话框可见性
 const visible = ref(false)
 // 表单数据
-const form = reactive<Project>({
-  id: undefined,
+const form = reactive<ProjectRoleDTO>({
+  id: 0,
   projectName: '',
-  doc: ''
+  doc: '',
+  roleUrls: []
 })
 // 表单校验规则
 const rules = {
@@ -63,7 +111,7 @@ const rules = {
 // 定义props
 const props = defineProps<{
   // 当前编辑的项目对象
-  project?: Project
+  project?: ProjectRoleDTO
 }>()
 
 // 定义事件
@@ -71,6 +119,58 @@ const emit = defineEmits<{
   // 提交成功事件
   (e: 'success'): void
 }>()
+
+/**
+ * 处理禁用角色
+ * @param role 角色对象
+ */
+const handleDisableRole = async (role: RoleUrl) => {
+  if (!role.id) {
+    ElMessage.error('角色ID不能为空')
+    return
+  }
+  try {
+    await disableRoleUrl(role.id)
+      ElMessage.success('禁用成功')
+
+      // 更新本地数据状态
+      if (form.roleUrls) {
+        const targetRole = form.roleUrls.find(item => item.id === role.id)
+        if (targetRole) {
+          targetRole.isDeleted = 1
+        }
+      }
+    } catch (error) {
+      console.error('禁用失败', error)
+      ElMessage.error('禁用失败，请稍后重试')
+    }
+}
+
+/**
+ * 处理启用角色
+ * @param role 角色对象
+ */
+const handleEnableRole = async (role: RoleUrl) => {
+  if (!role.id) {
+    ElMessage.error('角色ID不能为空')
+    return
+  }
+  try {
+    await enableRoleUrl(role.id)
+      ElMessage.success('启用成功')
+
+      // 更新本地数据状态
+      if (form.roleUrls) {
+        const targetRole = form.roleUrls.find(item => item.id === role.id)
+        if (targetRole) {
+          targetRole.isDeleted = 0
+        }
+      }
+    } catch (error) {
+      console.error('启用失败', error)
+    ElMessage.error('启用失败，请稍后重试')
+  }
+}
 
 // 对话框标题
 const title = computed(() => {
@@ -100,9 +200,10 @@ const reset = () => {
   if (formRef.value) {
     formRef.value.resetFields()
   }
-  form.id = undefined
+  form.id = 0
   form.projectName = ''
   form.doc = ''
+  form.roleUrls = []
 }
 
 // 提交表单
@@ -149,10 +250,32 @@ defineExpose({
   padding: 0 20px;
 }
 
+.form-section {
+  margin-bottom: 24px;
+}
+
+.section-header {
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--el-border-color-light);
+  padding-bottom: 10px;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--el-text-color-primary);
+}
+
+.role-table {
+  width: 100%;
+}
+
 .drawer-footer {
-  padding-top: 20px;
+  margin-top: 24px;
+  padding-top: 16px;
   text-align: right;
-  margin-bottom: 20px;
+  border-top: 1px solid var(--el-border-color-light);
 }
 
 :deep(.el-form-item__content) {

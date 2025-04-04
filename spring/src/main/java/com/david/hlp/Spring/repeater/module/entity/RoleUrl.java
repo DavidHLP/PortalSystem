@@ -3,17 +3,16 @@ package com.david.hlp.Spring.repeater.module.entity;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import lombok.experimental.SuperBuilder;
 /**
  * 角色信息实体类
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class RoleUrl {
     /**
      * 主键ID

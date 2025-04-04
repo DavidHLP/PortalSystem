@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.david.hlp.Spring.repeater.module.entity.RouterUrl;
 import java.util.List;
-
+import com.david.hlp.Spring.repeater.module.dto.RouterProjectDTO;
 @Mapper
 public interface RouterUrlMapper {
     /**
@@ -28,7 +28,7 @@ public interface RouterUrlMapper {
      * @param offset 偏移量
      * @return 路由列表
      */
-    List<RouterUrl> listRouterUrl(@Param("routerUrl") RouterUrl routerUrl, @Param("pageSize") Integer pageSize, @Param("offset") Integer offset);
+    List<RouterProjectDTO> listRouterUrl(@Param("routerUrl") RouterUrl routerUrl, @Param("pageSize") Integer pageSize, @Param("offset") Integer offset);
     
     /**
      * 更新路由信息

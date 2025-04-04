@@ -31,6 +31,14 @@
           <el-option label="UDP" value="UDP" />
         </el-select>
       </el-form-item>
+      <el-form-item label="HTTP方法" prop="httpMethod" v-if="isWebProtocol(form.protocol)">
+        <el-select v-model="form.httpMethod" placeholder="请选择HTTP方法">
+          <el-option :label="'GET'" :value="0" />
+          <el-option :label="'POST'" :value="1" />
+          <el-option :label="'PUT'" :value="2" />
+          <el-option :label="'DELETE'" :value="3" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="唯一标识" prop="uniqueId">
         <el-input v-model="form.uniqueId" placeholder="请输入唯一标识" />
       </el-form-item>
@@ -61,6 +69,7 @@ import { ref, reactive, computed, watchEffect } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance } from 'element-plus'
 import type { RouterUrl } from '@/types/repeater/routerurl'
+import { HttpMethodType } from '@/types/repeater/routerurl'
 import { addRouterUrl, updateRouterUrl } from '@/api/repeater/routerurl'
 import MdEditorElement from '@/components/markdown/MdEditorElement.vue'
 
@@ -77,7 +86,8 @@ const form = reactive<RouterUrl>({
   protocol: 'HTTP',
   uniqueId: '',
   type: "",
-  doc: ''
+  doc: '',
+  httpMethod: HttpMethodType.GET
 })
 // 表单校验规则
 const rules = {
@@ -102,6 +112,9 @@ const rules = {
   ],
   type: [
     { required: true, message: '路由类型不能为空', trigger: 'change' }
+  ],
+  httpMethod: [
+    { required: true, message: 'HTTP方法不能为空', trigger: 'change' }
   ]
 }
 
@@ -117,6 +130,15 @@ const emit = defineEmits<{
   (e: 'success'): void
 }>()
 
+/**
+ * 判断是否为Web协议
+ * @param protocol 协议类型
+ * @returns 是否为Web协议
+ */
+const isWebProtocol = (protocol: string): boolean => {
+  return protocol === 'HTTP' || protocol === 'HTTPS';
+}
+
 // 对话框标题
 const title = computed(() => {
   return form.id ? '编辑路由URL' : '添加路由URL'
@@ -129,6 +151,10 @@ watchEffect(() => {
     const routerUrlCopy = { ...props.routerUrl }
     // 确保doc是字符串类型
     routerUrlCopy.doc = routerUrlCopy.doc || ''
+    // 确保httpMethod有值
+    if (routerUrlCopy.httpMethod === undefined && isWebProtocol(routerUrlCopy.protocol)) {
+      routerUrlCopy.httpMethod = HttpMethodType.GET
+    }
     Object.assign(form, routerUrlCopy)
   }
 })
@@ -157,6 +183,7 @@ const reset = () => {
   form.uniqueId = ''
   form.type = ''
   form.doc = ''
+  form.httpMethod = HttpMethodType.GET
 }
 
 // 提交表单

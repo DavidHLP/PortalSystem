@@ -1,3 +1,5 @@
+import type { RoleUrl } from './roleurl'
+
 /**
  * 项目信息接口
  */
@@ -5,7 +7,7 @@ export interface Project {
   /**
    * 主键ID
    */
-  id?: number
+  id: number
 
   /**
    * 项目名称
@@ -31,4 +33,11 @@ export interface Project {
    * 是否删除:0-未删除,1-已删除
    */
   isDeleted?: number
+}
+
+/**
+ * 项目角色DTO
+ */
+export interface ProjectRoleDTO extends Project {
+  roleUrls?: RoleUrl[]
 }

@@ -65,4 +65,22 @@ public class RoleUrlServiceImpl {
     public List<RoleUrl> getRoleList() {
         return roleUrlMapper.getRoleList();
     }
+
+    /**
+     * 禁用角色URL
+     *
+     * @param id 角色URLID
+     */
+    public void disableRoleUrl(Long id) {
+        roleUrlMapper.disableRoleUrl(id);
+    }
+
+    /**
+     * 启用角色URL
+     *
+     * @param id 角色URLID
+     */
+    public void enableRoleUrl(Long id) {
+        roleUrlMapper.enableRoleUrl(id);
+    }
 }

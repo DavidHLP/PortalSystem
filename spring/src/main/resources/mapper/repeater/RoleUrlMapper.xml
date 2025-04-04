@@ -146,4 +146,22 @@
         FROM role_url ru
         WHERE ru.is_deleted = 0
     </select>
+
+    <!-- disableRoleUrl -->
+
+    <update id="disableRoleUrl">
+        UPDATE role_url
+        SET is_deleted = 1,
+            gmt_modified = NOW()
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <!-- enableRoleUrl -->
+
+    <update id="enableRoleUrl">
+        UPDATE role_url
+        SET is_deleted = 0,
+            gmt_modified = NOW()
+        WHERE id = #{id} AND is_deleted = 1
+    </update>
 </mapper>

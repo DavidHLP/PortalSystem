@@ -12,6 +12,7 @@ import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
 import com.david.hlp.Spring.repeater.module.entity.Project;
 import com.david.hlp.Spring.repeater.service.impl.ProjectServiceImpl;
+import com.david.hlp.Spring.repeater.module.dto.ProjectRoleDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +23,7 @@ public class ProjectController {
     private final ProjectServiceImpl projectService;
 
     @PostMapping("/list")
-    public Result<PageInfo<Project>> list(@RequestBody PageInfo<Project> pageInfo) {
+    public Result<PageInfo<ProjectRoleDTO>> list(@RequestBody PageInfo<ProjectRoleDTO> pageInfo) {
         return Result.success(projectService.listProjectByPage(pageInfo));
     }
 
