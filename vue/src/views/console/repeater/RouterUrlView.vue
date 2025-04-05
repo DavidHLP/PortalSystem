@@ -1,88 +1,82 @@
 <template>
   <div class="app-container">
     <!-- 搜索工具栏 -->
-    <el-card class="search-form-container">
-      <el-form :model="queryParams" ref="queryForm" :inline="true">
-        <el-form-item label="主机地址" prop="host">
-          <el-input v-model="queryParams.host" placeholder="请输入主机地址" clearable @keyup.enter="handleQuery" />
-        </el-form-item>
-        <el-form-item label="路由路径" prop="router">
-          <el-input v-model="queryParams.router" placeholder="请输入路由路径" clearable @keyup.enter="handleQuery" />
-        </el-form-item>
-        <el-form-item label="协议类型" prop="protocol">
-          <el-select v-model="queryParams.protocol" placeholder="请选择协议类型" clearable style="width: 100px;">
-            <el-option label="HTTP" value="HTTP" />
-            <el-option label="HTTPS" value="HTTPS" />
-            <el-option label="TCP" value="TCP" />
-            <el-option label="UDP" value="UDP" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="HTTP方法" prop="httpMethod" v-if="isWebProtocolQuery">
-          <el-select v-model="queryParams.httpMethod" placeholder="请选择HTTP方法" clearable style="width: 100px;">
-            <el-option label="GET" :value="0" />
-            <el-option label="POST" :value="1" />
-            <el-option label="PUT" :value="2" />
-            <el-option label="DELETE" :value="3" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="路由类型" prop="type">
-          <el-select v-model="queryParams.type" placeholder="请选择路由类型" clearable style="width: 100px;">
-            <el-option label="内部" :value="0" />
-            <el-option label="外部" :value="1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleQuery">
-            <el-icon>
-              <Search />
-            </el-icon> 搜索
-          </el-button>
-          <el-button @click="resetQuery">
-            <el-icon>
-              <Refresh />
-            </el-icon> 重置
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+    <div class="search-toolbar">
+      <div class="form-item">
+        <label class="form-label">主机地址</label>
+        <el-input v-model="queryParams.host" placeholder="请输入主机地址" clearable @keyup.enter="handleQuery" />
+      </div>
+      <div class="form-item">
+        <label class="form-label">路由路径</label>
+        <el-input v-model="queryParams.router" placeholder="请输入路由路径" clearable @keyup.enter="handleQuery" />
+      </div>
+      <div class="form-item">
+        <label class="form-label">协议类型</label>
+        <el-select v-model="queryParams.protocol" placeholder="请选择协议类型" clearable class="form-select">
+          <el-option label="HTTP" value="HTTP" />
+          <el-option label="HTTPS" value="HTTPS" />
+          <el-option label="TCP" value="TCP" />
+          <el-option label="UDP" value="UDP" />
+        </el-select>
+      </div>
+      <div class="form-item" v-if="isWebProtocolQuery">
+        <label class="form-label">HTTP方法</label>
+        <el-select v-model="queryParams.httpMethod" placeholder="请选择HTTP方法" clearable class="form-select">
+          <el-option label="GET" :value="0" />
+          <el-option label="POST" :value="1" />
+          <el-option label="PUT" :value="2" />
+          <el-option label="DELETE" :value="3" />
+        </el-select>
+      </div>
+      <div class="form-item">
+        <label class="form-label">路由类型</label>
+        <el-select v-model="queryParams.type" placeholder="请选择路由类型" clearable class="form-select">
+          <el-option label="内部" :value="0" />
+          <el-option label="外部" :value="1" />
+        </el-select>
+      </div>
+      <div class="search-buttons">
+        <el-button type="primary" class="search-btn" @click="handleQuery">
+          <el-icon><Search /></el-icon> 搜索
+        </el-button>
+        <el-button class="reset-btn" @click="resetQuery">
+          <el-icon><Refresh /></el-icon> 重置
+        </el-button>
+      </div>
+    </div>
 
     <!-- 操作工具栏 -->
-    <el-card class="table-container">
+    <el-card class="table-container" shadow="hover">
       <template #header>
         <div class="card-header">
           <span class="card-title">路由URL列表</span>
           <el-button type="primary" @click="handleAdd">
-            <el-icon>
-              <Plus />
-            </el-icon> 新增
+            <el-icon><Plus /></el-icon> 新增
           </el-button>
         </div>
       </template>
 
       <!-- 表格数据 -->
       <el-table v-loading="loading" :data="routerUrlList" border stripe>
-        <el-table-column label="序号" type="index" width="60" align="center" />
-        <el-table-column label="完整URL" min-width="320" :show-overflow-tooltip="true">
+        <el-table-column label="序号" type="index" width="70" align="center" />
+        <el-table-column label="完整URL" min-width="300" :show-overflow-tooltip="true">
           <template #default="scope">
             <div class="url-display">
               <el-tag size="small" :type="getProtocolTagType(scope.row.protocol) || undefined" effect="dark"
                 class="protocol-tag">
                 {{ scope.row.protocol }}
               </el-tag>
-              <span class="url-text">{{ getFormattedUrl(scope.row) }}
-                <el-tooltip content="复制URL" placement="top">
-                  <el-button type="primary" size="small" circle @click="copyUrl(scope.row)">
-                    <el-icon>
-                      <DocumentCopy />
-                    </el-icon>
-                  </el-button>
-                </el-tooltip>
-              </span>
+              <span class="url-text">{{ getFormattedUrl(scope.row) }}</span>
+              <el-tooltip content="复制URL" placement="top">
+                <el-button type="primary" link @click="copyUrl(scope.row)" class="copy-btn">
+                  <el-icon><DocumentCopy /></el-icon>
+                </el-button>
+              </el-tooltip>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="协议类型" prop="protocol" width="120" align="center" />
-        <el-table-column label="HTTP方法" prop="httpMethod" width="120" align="center" v-if="hasHttpMethodColumn">
+        <el-table-column label="协议类型" prop="protocol" width="100" align="center" />
+        <el-table-column label="HTTP方法" prop="httpMethod" width="100" align="center" v-if="hasHttpMethodColumn">
           <template #default="scope">
             <el-tag v-if="isWebProtocol(scope.row.protocol)" :type="getHttpMethodTagType(scope.row.httpMethod || HttpMethodType.GET) as any">
               {{ scope.row.httpMethod || HttpMethodType.GET }}
@@ -90,12 +84,14 @@
           </template>
         </el-table-column>
         <el-table-column label="唯一标识" prop="uniqueId" width="120" :show-overflow-tooltip="true" />
-        <el-table-column label="路由类型" prop="type" width="120" align="center">
+        <el-table-column label="路由类型" prop="type" width="90" align="center">
           <template #default="scope">
-            {{ scope.row.type === 0 ? '内部' : '外部' }}
+            <el-tag :type="scope.row.type === 0 ? 'info' : 'warning'" size="small">
+              {{ scope.row.type === 0 ? '内部' : '外部' }}
+            </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="关联项目" min-width="180" :show-overflow-tooltip="true">
+        <el-table-column label="关联项目" min-width="160" :show-overflow-tooltip="true">
           <template #default="scope">
             <div class="projects-tags">
               <template v-if="scope.row.projects && scope.row.projects.length > 0">
@@ -109,51 +105,54 @@
                 >
                   {{ project.projectName }}
                 </el-tag>
-                <el-tag
-                  v-if="scope.row.projects.length > 3"
-                  size="small"
-                  type="info"
-                  class="more-tag"
-                >
-                  +{{ scope.row.projects.length - 3 }}
-                </el-tag>
+                <el-tooltip v-if="scope.row.projects.length > 3" :content="scope.row.projects.slice(3).map((p: Project) => p.projectName).join(', ')">
+                  <el-tag
+                    size="small"
+                    type="info"
+                    class="more-tag"
+                  >
+                    +{{ scope.row.projects.length - 3 }}
+                  </el-tag>
+                </el-tooltip>
               </template>
               <span v-else class="no-project">暂无关联项目</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="文档说明" prop="doc" min-width="220" :show-overflow-tooltip="false">
+        <el-table-column label="文档说明" prop="doc" min-width="200" :show-overflow-tooltip="false">
           <template #default="scope">
             <div class="doc-preview">
-              {{ truncateDoc(scope.row.doc) }}
-              <el-button v-if="scope.row.doc" type="primary" link @click="viewFullDoc(scope.row.doc)">
+              <span class="doc-text">{{ truncateDoc(scope.row.doc) }}</span>
+              <el-button v-if="scope.row.doc" type="primary" link @click="viewFullDoc(scope.row.doc)" class="view-doc-btn">
                 查看详情
               </el-button>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="180" align="center">
+        <el-table-column label="操作" fixed="right" width="160" align="center">
           <template #default="scope">
             <div class="action-buttons">
-              <el-button type="primary" size="small" @click="handleEdit(scope.row)">
-                编辑
-              </el-button>
-              <el-button type="danger" size="small" @click="handleDelete(scope.row)">
-                删除
-              </el-button>
+              <el-button type="primary" link @click="handleEdit(scope.row)">编辑</el-button>
+              <el-button type="danger" link @click="handleDelete(scope.row)">删除</el-button>
             </div>
           </template>
         </el-table-column>
       </el-table>
 
       <!-- 分页组件 -->
-      <el-pagination class="pagination" v-model:current-page="pageInfo.pageNum" v-model:page-size="pageInfo.pageSize"
-        :page-sizes="[10, 20, 50, 100]" :total="pageInfo.total" layout="total, sizes, prev, pager, next, jumper"
-        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+      <el-pagination class="pagination"
+        v-model:current-page="pageInfo.pageNum"
+        v-model:page-size="pageInfo.pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="pageInfo.total"
+        layout="total, sizes, prev, pager, next, jumper"
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange" />
     </el-card>
 
     <!-- 路由URL编辑组件 -->
-    <RouterUrlComponents ref="routerUrlFormRef" :router-url="editRouterUrl" @success="getRouterUrlList" />
+    <RouterUrlComponents ref="routerUrlFormRef" :router-url="editRouterUrl" :project-list="projectList" @success="getRouterUrlList" />
 
     <!-- Markdown文档查看抽屉 -->
     <el-drawer v-model="docDrawerVisible" title="文档详情" size="70%" direction="rtl" destroy-on-close>
@@ -167,31 +166,13 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus, DocumentCopy } from '@element-plus/icons-vue'
 import type { RouterProjectDTO } from '@/types/repeater/routerurl'
+import type { Project } from '@/types/repeater/project'
 import { HttpMethodType } from '@/types/repeater/routerurl'
 import type { PageInfo } from '@/types/common'
 import { listRouterUrl, deleteRouterUrl } from '@/api/repeater/routerurl'
 import RouterUrlComponents from '@/components/repeater/RouterUrlComponents.vue'
 import MarkdownView from '@/components/markdown/MarkdownView.vue'
-
-/**
- * 格式化日期时间
- * @param time 时间戳
- * @returns 格式化后的日期时间字符串
- */
-const formatDateTime = (time: string | number | Date): string => {
-  if (!time) {
-    return '';
-  }
-  const date = new Date(time);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
+import { listAllProject } from '@/api/repeater/project'
 
 // 加载状态
 const loading = ref(false)
@@ -209,6 +190,9 @@ const pageInfo = reactive<PageInfo<RouterProjectDTO>>({
   total: 0,
   item: {} as RouterProjectDTO
 })
+
+// 项目列表
+const projectList = ref<Project[]>([])
 
 // 查询参数
 const queryParams = reactive<Partial<RouterProjectDTO>>({
@@ -240,24 +224,6 @@ const hasHttpMethodColumn = computed(() => {
  */
 const isWebProtocol = (protocol: string): boolean => {
   return protocol === 'HTTP' || protocol === 'HTTPS';
-}
-
-/**
- * 获取HTTP方法名称
- * @param method HTTP方法类型
- * @returns HTTP方法名称
- */
-const getHttpMethodName = (method: HttpMethodType | undefined): string => {
-  if (method === undefined) {
-    return '';
-  }
-  switch (method) {
-    case HttpMethodType.GET: return 'GET';
-    case HttpMethodType.POST: return 'POST';
-    case HttpMethodType.PUT: return 'PUT';
-    case HttpMethodType.DELETE: return 'DELETE';
-    default: return '';
-  }
 }
 
 /**
@@ -355,8 +321,10 @@ const handleCurrentChange = (page: number) => {
 /**
  * 处理添加
  */
-const handleAdd = () => {
+const handleAdd = async () => {
+  projectList.value = await listAllProject()
   editRouterUrl.value = {
+    id: 0,
     host: '',
     port: '',
     router: '',
@@ -373,7 +341,8 @@ const handleAdd = () => {
 /**
  * 处理编辑
  */
-const handleEdit = (row: RouterProjectDTO) => {
+const handleEdit = async (row: RouterProjectDTO) => {
+  projectList.value = await listAllProject()
   editRouterUrl.value = { ...row }
   routerUrlFormRef.value.open()
 }
@@ -510,21 +479,124 @@ onMounted(() => {
   padding: 20px;
 }
 
+.search-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+
+  .form-item {
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+
+    .form-label {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #eaeaea;
+      font-weight: 500;
+    }
+
+    :deep(.el-input__wrapper) {
+      background-color: #2a2a2a;
+      border: 1px solid #3e3e3e;
+
+      &:hover, &:focus, &.is-focus {
+        border-color: #409eff;
+      }
+
+      .el-input__inner {
+        color: #eaeaea;
+
+        &::placeholder {
+          color: #8c8c8c;
+        }
+      }
+    }
+
+    :deep(.el-select) {
+      width: 100%;
+
+      .el-input__wrapper {
+        background-color: #2a2a2a;
+        border: 1px solid #3e3e3e;
+      }
+    }
+  }
+
+  .form-select {
+    width: 180px;
+  }
+
+  .search-buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+    align-self: flex-end;
+
+    .search-btn {
+      background: #67c23a;
+      border-color: #67c23a;
+
+      &:hover {
+        background: #85ce61;
+        border-color: #85ce61;
+      }
+    }
+
+    .reset-btn {
+      color: #eaeaea;
+      background-color: transparent;
+      border-color: #606266;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+}
+
 .search-form-container {
   margin-bottom: 20px;
+  border-radius: 8px;
+
+  .search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  :deep(.el-form-item) {
+    margin-bottom: 12px;
+    margin-right: 20px;
+  }
+
+  .search-btns {
+    margin-left: auto;
+  }
 }
 
 .table-container {
   margin-bottom: 20px;
   border-radius: 8px;
-  overflow: hidden;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
 
   :deep(.el-table) {
     --el-table-border-color: var(--el-border-color-lighter);
-    --el-table-header-bg-color: var(--el-fill-color-light);
+    border-radius: 4px;
+    overflow: hidden;
 
-    th {
-      font-weight: bold;
+    .el-table__row {
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: var(--el-fill-color-lighter);
+      }
     }
   }
 }
@@ -533,6 +605,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 8px 0;
 }
 
 .card-title {
@@ -542,20 +615,31 @@ onMounted(() => {
 }
 
 .pagination {
-  margin-top: 20px;
-  text-align: right;
+  margin-top: 24px;
+  text-align: center;
+  padding: 10px 0;
 }
 
 .doc-preview {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  .doc-text {
+    color: var(--el-text-color-regular);
+    font-size: 14px;
+  }
+
+  .view-doc-btn {
+    padding: 2px 6px;
+  }
 }
 
 .projects-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
+  padding: 2px 0;
 }
 
 .project-tag {
@@ -576,11 +660,11 @@ onMounted(() => {
 .url-display {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .protocol-tag {
-  min-width: 60px;
+  min-width: 50px;
   text-align: center;
 }
 
@@ -589,17 +673,18 @@ onMounted(() => {
   color: var(--el-color-primary-light-3);
   flex: 1;
   word-break: break-all;
+  font-size: 13px;
+  padding: 0 4px;
 }
 
-.url-actions {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
+.copy-btn {
+  flex-shrink: 0;
+  margin-left: 4px;
 }
 
 .action-buttons {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
 }
 </style>

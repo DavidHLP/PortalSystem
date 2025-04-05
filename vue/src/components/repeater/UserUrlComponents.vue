@@ -30,12 +30,27 @@
             show-password
           />
         </el-form-item>
+        <el-form-item label="项目" prop="projectId" v-if="dialogStatus !== 'password'">
+          <el-select
+            v-model="form.projectId"
+            placeholder="请选择项目"
+            filterable
+            @change="handleProjectChange">
+            <el-option
+              v-for="project in projects"
+              :key="project.id"
+              :label="project.projectName"
+              :value="project.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="角色" prop="roleId" v-if="dialogStatus !== 'password'">
           <el-select
             v-model="form.roleId"
-            placeholder="请选择角色"
+            :placeholder="form.projectId && (!roleOptions || roleOptions.length === 0) ? '' : '请选择角色'"
             filterable
             remote
+            :disabled="!form.projectId"
             :remote-method="remoteSearch"
             :loading="loading">
             <el-option
@@ -45,6 +60,9 @@
               :value="role.id"
             />
           </el-select>
+          <div v-if="form.projectId && (!roleOptions || roleOptions.length === 0)" class="role-empty-tip">
+            请为该项目创建角色
+          </div>
         </el-form-item>
         <el-form-item label="状态" prop="status" v-if="dialogStatus !== 'password'">
           <el-radio-group v-model="form.status">
@@ -93,7 +111,9 @@ import {
   updateUserPassword
 } from '@/api/repeater/userurl'
 import { getRoleList } from '@/api/repeater/roleurl'
-
+import type { Project } from '@/types/repeater/project'
+import { listAllProject } from '@/api/repeater/project'
+const projects = ref<Project[]>([])
 // 定义发射事件
 const emit = defineEmits(['refresh'])
 
@@ -119,6 +139,7 @@ const form = reactive({
   username: '',
   email: '',
   password: '',
+  projectId: undefined as number | undefined,
   roleId: undefined as number | undefined,
   status: 0
 })
@@ -134,11 +155,12 @@ const rules = reactive<FormRules>({
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
   ],
+  projectId: [{ required: true, message: '请选择项目', trigger: 'change' }],
   roleId: [{ required: true, message: '请选择角色', trigger: 'change' }]
 })
 
 // 角色选项（实际使用时需要从后端获取）
-const roleOptions = ref<{ id: number; roleName: string }[]>([])
+const roleOptions = ref<{ id: number; roleName: string; projectId: number }[]>([])
 const loading = ref(false)
 
 // 获取所有角色选项
@@ -148,8 +170,37 @@ const getRoleOptions = async () => {
     const res = await getRoleList()
     roleOptions.value = res.map((item: any) => ({
       id: item.id,
-      roleName: item.roleName
+      roleName: item.roleName,
+      projectId: item.projectId
     }))
+    console.log('roleOptions', roleOptions.value)
+  } catch (error) {
+    ElMessage.error('获取角色列表失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 处理项目变更
+const handleProjectChange = (projectId: number) => {
+  form.roleId = undefined
+  if (projectId) {
+    getRolesByProject(projectId)
+  } else {
+    roleOptions.value = []
+  }
+}
+
+// 根据项目获取角色列表
+const getRolesByProject = async (projectId: number) => {
+  loading.value = true
+  try {
+    const res = await getRoleList()
+    roleOptions.value = res.map((item: any) => ({
+      id: item.id,
+      roleName: item.roleName,
+      projectId: item.projectId
+    })).filter((item: any) => item.projectId === projectId)
   } catch (error) {
     ElMessage.error('获取角色列表失败')
   } finally {
@@ -159,25 +210,31 @@ const getRoleOptions = async () => {
 
 // 远程搜索方法
 const remoteSearch = async (query: string) => {
+  if (!form.projectId) {
+    ElMessage.warning('请先选择项目')
+    return
+  }
+
   if (query !== '') {
     loading.value = true
     try {
       const res = await getRoleList()
       // 前端过滤搜索结果
-      roleOptions.value = res
-        .filter((item: any) => item.roleName.toLowerCase().includes(query.toLowerCase()))
-        .map((item: any) => ({
-          id: item.id,
-          roleName: item.roleName
-        }))
+      roleOptions.value = res.map((item: any) => ({
+        id: item.id,
+        roleName: item.roleName,
+        projectId: item.projectId
+      })).filter((item: any) => item.projectId === form.projectId && item.roleName.toLowerCase().includes(query.toLowerCase()))
     } catch (error) {
       ElMessage.error('搜索角色失败')
     } finally {
       loading.value = false
     }
   } else {
-    // 如果查询为空，则获取所有角色
-    getRoleOptions()
+    // 如果查询为空，则获取当前项目的所有角色
+    if (form.projectId) {
+      getRolesByProject(form.projectId)
+    }
   }
 }
 
@@ -198,9 +255,15 @@ const handleEdit = (row: any) => {
     id: row.id,
     username: row.username,
     email: row.email,
+    projectId: row.projectId,
     roleId: row.roleId,
     status: row.status
   })
+
+  if (row.projectId) {
+    getRolesByProject(row.projectId)
+  }
+
   dialogVisible.value = true
 }
 
@@ -270,9 +333,17 @@ const resetForm = () => {
     username: '',
     email: '',
     password: '',
+    projectId: undefined,
     roleId: undefined,
     status: 0
   })
+  roleOptions.value = []
+}
+
+// 获取所有项目
+const getProjects = async () => {
+  const res = await listAllProject()
+  projects.value = res
 }
 
 // 公开方法
@@ -285,6 +356,7 @@ defineExpose({
 
 onMounted(() => {
   getRoleOptions()
+  getProjects()
 })
 </script>
 
@@ -294,6 +366,13 @@ onMounted(() => {
     display: flex;
     justify-content: flex-end;
     margin-top: 20px;
+  }
+
+  .role-empty-tip {
+    color: #f56c6c;
+    font-size: 12px;
+    line-height: 1;
+    padding-top: 4px;
   }
 }
 </style>

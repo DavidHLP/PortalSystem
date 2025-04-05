@@ -7,7 +7,7 @@ export interface Project {
   /**
    * 主键ID
    */
-  id: number
+  id: number | string
 
   /**
    * 项目名称

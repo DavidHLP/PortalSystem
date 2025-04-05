@@ -9,6 +9,7 @@ import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
 import com.david.hlp.Spring.repeater.module.entity.RoleUrl;
 import com.david.hlp.Spring.repeater.service.impl.RoleUrlServiceImpl;
+import com.david.hlp.Spring.repeater.module.dto.RoleUrlDTO;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -20,18 +21,18 @@ public class RoleUrlController {
     private final RoleUrlServiceImpl roleUrlService;
 
     @PostMapping("/list")
-    public Result<PageInfo<RoleUrl>> list(@RequestBody PageInfo<RoleUrl> pageInfo) {
+    public Result<PageInfo<RoleUrlDTO>> list(@RequestBody PageInfo<RoleUrlDTO> pageInfo) {
         return Result.success(roleUrlService.listRoleUrlByPage(pageInfo));
     }
 
     @PostMapping("/add")
-    public Result<Void> add(@RequestBody RoleUrl roleUrl) {
+    public Result<Void> add(@RequestBody RoleUrlDTO roleUrl) {
         roleUrlService.addRoleUrl(roleUrl);
         return Result.success("添加成功");
     }
 
     @PostMapping("/update")
-    public Result<Void> update(@RequestBody RoleUrl roleUrl) {
+    public Result<Void> update(@RequestBody RoleUrlDTO roleUrl) {
         roleUrlService.updateRoleUrl(roleUrl);
         return Result.success("更新成功");
     }
@@ -42,7 +43,7 @@ public class RoleUrlController {
         return Result.success("删除成功");
     }
 
-        /**
+    /**
      * 获取角色列表
      *
      * @return 角色列表
@@ -73,5 +74,4 @@ public class RoleUrlController {
         roleUrlService.enableRoleUrl(roleUrl.getId());
         return Result.success("启用成功");
     }
-
 }

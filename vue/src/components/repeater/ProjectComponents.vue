@@ -81,7 +81,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, computed, watchEffect } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import type { FormInstance } from 'element-plus'
 import type { ProjectRoleDTO } from '@/types/repeater/project'
 import type { RoleUrl } from '@/types/repeater/roleurl'
@@ -130,16 +130,16 @@ const handleDisableRole = async (role: RoleUrl) => {
     return
   }
   try {
-    await disableRoleUrl(role.id)
+    await disableRoleUrl(Number(role.id))
       ElMessage.success('禁用成功')
 
-      // 更新本地数据状态
-      if (form.roleUrls) {
-        const targetRole = form.roleUrls.find(item => item.id === role.id)
-        if (targetRole) {
-          targetRole.isDeleted = 1
-        }
+    // 更新本地数据状态
+    if (form.roleUrls) {
+      const targetRole = form.roleUrls.find(item => item.id === role.id)
+      if (targetRole) {
+        targetRole.isDeleted = 1
       }
+    }
     } catch (error) {
       console.error('禁用失败', error)
       ElMessage.error('禁用失败，请稍后重试')
@@ -156,7 +156,7 @@ const handleEnableRole = async (role: RoleUrl) => {
     return
   }
   try {
-    await enableRoleUrl(role.id)
+    await enableRoleUrl(Number(role.id))
       ElMessage.success('启用成功')
 
       // 更新本地数据状态
@@ -181,6 +181,7 @@ const title = computed(() => {
 watchEffect(() => {
   if (props.project) {
     Object.assign(form, props.project)
+    form.doc = props.project.doc ? props.project.doc : ''
   }
 })
 

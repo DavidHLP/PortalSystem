@@ -7,7 +7,7 @@
     </sql>
 
     <!-- 插入路由信息 -->
-    <insert id="insertRouterUrl" parameterType="com.david.hlp.Spring.repeater.module.entity.RouterUrl">
+    <insert id="insertRouterUrl" parameterType="com.david.hlp.Spring.repeater.module.dto.RouterProjectDTO">
         INSERT INTO router_url (
             host, port, router, protocol, unique_id, type, http_method, doc, gmt_create, gmt_modified, is_deleted
         ) VALUES (
@@ -112,5 +112,64 @@
         FROM router_url
         WHERE is_deleted = 0
         ORDER BY id DESC
+    </select>
+
+    <!-- listRouterProjectById -->
+
+    <select id="listRouterProjectById" resultType="com.david.hlp.Spring.repeater.module.entity.RouterProject">
+        SELECT * FROM router_project_url WHERE router_id = #{id}
+    </select>
+
+    <!-- deleteRouterProject -->
+
+    <delete id="deleteRouterProject">
+        DELETE FROM router_project_url
+        <where>
+            <foreach collection="list" item="item" separator="OR">
+                (router_id = #{item.routerId} AND project_id = #{item.projectId})
+            </foreach>
+        </where>
+    </delete>
+
+    <!-- insertRouterProject -->
+
+    <insert id="insertRouterProject">
+        INSERT IGNORE INTO router_project_url (router_id, project_id)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.routerId}, #{item.projectId})
+        </foreach>
+    </insert>
+
+    <!-- selectRouterIdByUniqueId -->
+
+    <select id="selectRouterIdByUniqueId" resultType="java.lang.Long" parameterType="java.lang.String">
+        SELECT id FROM router_url WHERE unique_id = #{uniqueId}
+    </select>
+
+    <!-- deleteRouterRole -->
+
+    <delete id="deleteRouterRole">
+        DELETE FROM router_role_url WHERE router_id = #{routerId} AND role_id = #{roleId}
+    </delete>
+
+    <!-- insertRouterRole -->
+
+    <insert id="insertRouterRole">
+        INSERT INTO router_role_url (router_id, role_id) VALUES (#{routerId}, #{roleId})
+    </insert>
+
+    <!-- listRouterRoleByRoleId -->
+
+    <select id="listRouterRoleByRoleId" resultType="com.david.hlp.Spring.repeater.module.entity.RouterRole">
+        SELECT * FROM router_role_url WHERE role_id = #{roleId}
+    </select>
+
+    <!-- listRouterUrlByProjectId --> 
+
+    <select id="listRouterUrlByProjectId" resultType="com.david.hlp.Spring.repeater.module.entity.RouterUrl">
+        SELECT * FROM router_url WHERE id IN (
+            SELECT router_id FROM router_project_url WHERE project_id = #{projectId}
+        )
     </select>
 </mapper>

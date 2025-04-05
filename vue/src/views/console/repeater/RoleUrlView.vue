@@ -181,7 +181,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-import type { RoleUrl } from '@/types/repeater/roleurl.ts'
+import type { RoleUrl, RoleUrlDTO } from '@/types/repeater/roleurl.ts'
 import type { PageInfo } from '@/types/common'
 import { listRoleUrl, deleteRoleUrl } from '@/api/repeater/roleurl'
 import RoleUrlCompoenrs from '@/components/repeater/RoleUrlCompoenrs.vue'
@@ -212,11 +212,15 @@ const loading = ref(false)
 // 角色URL列表
 const roleUrlList = ref<RoleUrl[]>([])
 // 编辑的角色URL对象
-const editRoleUrl = ref<RoleUrl>({
+const editRoleUrl = ref<RoleUrlDTO>({
+  id: '',
   roleName: '',
   project: {
-    projectName: ''
-  }
+    id: '',
+    projectName: '',
+    doc: ''
+  },
+  routers: []
 })
 // 角色URL表单组件引用
 const roleUrlFormRef = ref()
@@ -227,14 +231,21 @@ const pageInfo = reactive<PageInfo<RoleUrl>>({
   pageSize: 10,
   total: 0,
   item: {
-    project: {}
+    id: '',
+    project: {
+      id: '',
+      projectName: '',
+      doc: ''
+    }
   }
 })
 
 // 查询参数
 const queryParams = reactive<RoleUrl>({
+  id: '',
   roleName: '',
   project: {
+    id: '',
     projectName: ''
   }
 })
@@ -251,8 +262,10 @@ const getRoleUrlList = async () => {
   try {
     // 设置查询条件
     pageInfo.item = {
+      id: queryParams.id,
       roleName: queryParams.roleName,
       project: {
+        id: queryParams.project?.id || '',
         projectName: queryParams.project?.projectName || ''
       }
     }
@@ -260,6 +273,7 @@ const getRoleUrlList = async () => {
     const res = await listRoleUrl(pageInfo)
     roleUrlList.value = res.items || []
     pageInfo.total = res.total || 0
+    console.log(res)
   } catch (error) {
     console.error('获取角色URL列表失败', error)
     ElMessage.error('获取角色URL列表失败')
@@ -308,10 +322,14 @@ const handleCurrentChange = (page: number) => {
  */
 const handleAdd = () => {
   editRoleUrl.value = {
+    id: '',
     roleName: '',
     project: {
-      projectName: ''
-    }
+      id: '',
+      projectName: '',
+      doc: ''
+    },
+    routers: []
   }
   roleUrlFormRef.value.open()
 }
@@ -319,7 +337,7 @@ const handleAdd = () => {
 /**
  * 处理编辑
  */
-const handleEdit = (row: RoleUrl) => {
+const handleEdit = (row: RoleUrlDTO) => {
   editRoleUrl.value = { ...row }
   roleUrlFormRef.value.open()
 }

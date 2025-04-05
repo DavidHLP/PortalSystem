@@ -19,6 +19,38 @@
         </association>
     </resultMap>
 
+    <resultMap id="RoleUrlDTO" type="com.david.hlp.Spring.repeater.module.dto.RoleUrlDTO">
+        <id column="id" property="id" />
+        <result column="role_name" property="roleName" />
+        <result column="project_id" property="projectId" />
+        <result column="doc" property="doc" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+        <result column="is_deleted" property="isDeleted" />
+        <association property="project" javaType="com.david.hlp.Spring.repeater.module.entity.Project">
+            <id column="p_id" property="id" />
+            <result column="p_project_name" property="projectName" />
+            <result column="p_doc" property="doc" />
+            <result column="p_gmt_create" property="gmtCreate" />
+            <result column="p_gmt_modified" property="gmtModified" />
+            <result column="p_is_deleted" property="isDeleted" />
+        </association>
+        <collection property="routers" ofType="com.david.hlp.Spring.repeater.module.entity.RouterUrl">
+            <id property="id" column="r_id" />
+            <result property="host" column="host" />
+            <result property="port" column="port" />
+            <result property="router" column="router" />
+            <result property="protocol" column="protocol" />
+            <result property="uniqueId" column="unique_id" />
+            <result property="type" column="type" />
+            <result property="httpMethod" column="http_method" />
+            <result property="doc" column="r_doc" />
+            <result property="gmtCreate" column="r_gmt_create" />
+            <result property="gmtModified" column="r_gmt_modified" />
+            <result property="isDeleted" column="r_is_deleted" />
+        </collection>
+    </resultMap>
+
     <sql id="Base_Column_List">
         ru.id, ru.role_name, ru.project_id, ru.doc, ru.gmt_create, ru.gmt_modified, ru.is_deleted,
         p.id as p_id, p.project_name as p_project_name, p.doc as p_doc, p.gmt_create as p_gmt_create,
@@ -66,13 +98,35 @@
         </where>
     </select>
 
-    <select id="listRoleUrl" resultMap="BaseResultMap" parameterType="com.david.hlp.Spring.common.result.PageInfo">
+    <select id="listRoleUrl" resultMap="RoleUrlDTO" parameterType="com.david.hlp.Spring.common.result.PageInfo">
         SELECT
-        <include refid="Base_Column_List" />
-        FROM role_url ru
-        LEFT JOIN project p ON ru.project_id = p.id
-        <include refid="Where_Clause" />
-        ORDER BY ru.id DESC
+        role_url.id, role_url.role_name, role_url.project_id, role_url.doc, role_url.gmt_create, role_url.gmt_modified, role_url.is_deleted,
+        project.id as p_id, project.project_name as p_project_name, project.doc as p_doc, project.gmt_create as p_gmt_create,
+        project.gmt_modified as p_gmt_modified, project.is_deleted as p_is_deleted,
+        router_url.id as r_id, router_url.host, router_url.port, router_url.router,
+        router_url.protocol, router_url.unique_id, router_url.type, router_url.http_method,
+        router_url.doc as r_doc, router_url.gmt_create as r_gmt_create,
+        router_url.gmt_modified as r_gmt_modified, router_url.is_deleted as r_is_deleted
+        FROM role_url
+        LEFT JOIN router_role_url ON router_role_url.role_id = role_url.id
+        LEFT JOIN router_url ON router_url.id = router_role_url.router_id
+        LEFT JOIN project ON role_url.project_id = project.id
+        WHERE role_url.is_deleted = 0 AND project.is_deleted = 0
+        <if test="item != null">
+            <if test="item.id != null">
+                AND role_url.id = #{item.id}
+            </if>
+            <if test="item.roleName != null and item.roleName != ''">
+                AND role_url.role_name LIKE CONCAT('%', #{item.roleName}, '%')
+            </if>
+            <if test="item.projectId != null">
+                AND role_url.project_id = #{item.projectId}
+            </if>
+            <if test="item.project != null and item.project.projectName != null and item.project.projectName != ''">
+                AND project.project_name LIKE CONCAT('%', #{item.project.projectName}, '%')
+            </if>
+        </if>
+        ORDER BY role_url.id DESC
         <if test="pageNum != null and pageSize != null">
             LIMIT #{pageNum}, #{pageSize}
         </if>
@@ -142,7 +196,7 @@
 
     <select id="getRoleList" resultMap="BaseResultMap">
         SELECT
-        ru.id, ru.role_name
+        ru.id, ru.role_name, ru.project_id
         FROM role_url ru
         WHERE ru.is_deleted = 0
     </select>

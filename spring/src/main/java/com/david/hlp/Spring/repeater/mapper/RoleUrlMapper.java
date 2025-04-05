@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.repeater.module.entity.RoleUrl;
 import com.david.hlp.Spring.repeater.module.entity.UserRole;
+import com.david.hlp.Spring.repeater.module.dto.RoleUrlDTO;
 @Mapper
 public interface RoleUrlMapper {
     /**
@@ -23,7 +24,7 @@ public interface RoleUrlMapper {
      * @param pageInfo 分页参数
      * @return 角色URL列表
      */
-    List<RoleUrl> listRoleUrl(PageInfo<RoleUrl> pageInfo);
+    List<RoleUrlDTO> listRoleUrl(PageInfo<RoleUrlDTO> pageInfo);
 
     /**
      * 新增角色URL

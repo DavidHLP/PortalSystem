@@ -36,12 +36,12 @@
 
       <!-- 表格数据 -->
       <el-table v-loading="loading" :data="projectList" border stripe>
-        <el-table-column label="序号" type="index" width="60" align="center" />
+        <el-table-column label="序号" prop="id" width="60" align="center" />
         <el-table-column label="项目名称" prop="projectName" min-width="180" :show-overflow-tooltip="true" />
         <el-table-column label="文档说明" prop="doc" min-width="220" :show-overflow-tooltip="false">
           <template #default="scope">
             <div class="doc-preview">
-              {{ truncateDoc(scope.row.doc.slice(0, 20)) }}
+              {{ truncateDoc(scope.row.doc != null && scope.row.doc.length > 20 ? scope.row.doc.slice(0, 20) : scope.row.doc) }}
               <el-button v-if="scope.row.doc" type="primary" link @click="viewFullDoc(scope.row.doc)">
                 查看详情
               </el-button>

@@ -1,5 +1,5 @@
 import type { Project } from './project'
-
+import type { RouterUrl } from './routerurl'
 /**
  * 角色URL实体类型定义
  */
@@ -7,7 +7,7 @@ export interface RoleUrl {
   /**
    * 主键ID
    */
-  id: number
+  id: number | string
 
   /**
    * 角色名称
@@ -43,4 +43,8 @@ export interface RoleUrl {
    * 项目信息
    */
   project?: Project
+}
+
+export interface RoleUrlDTO extends RoleUrl {
+  routers: RouterUrl[]
 }

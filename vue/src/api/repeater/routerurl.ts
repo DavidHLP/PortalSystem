@@ -1,5 +1,5 @@
 import request from '@/utils/request/request'
-import type { RouterUrl } from '@/types/repeater/routerurl'
+import type { RouterUrl, RouterProjectDTO } from '@/types/repeater/routerurl'
 import type { PageInfo } from '@/types/common'
 
 // 添加路由URL
@@ -12,7 +12,7 @@ export function addRouterUrl(data: RouterUrl): Promise<void> {
 }
 
 // 更新路由URL
-export function updateRouterUrl(data: RouterUrl): Promise<void> {
+export function updateRouterUrl(data: RouterProjectDTO): Promise<void> {
   return request({
     url: '/api/routerUrl/update',
     method: 'post',
@@ -43,5 +43,13 @@ export function listAllRouterUrl(): Promise<RouterUrl[]> {
   return request({
     url: '/api/routerUrl/list',
     method: 'get'
+  })
+}
+
+export function listRouterUrlByProjectId(id: number): Promise<RouterUrl[]> {
+  return request({
+    url: '/api/routerUrl/listByProjectId',
+    method: 'get',
+    params: { id: id }
   })
 }

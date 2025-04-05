@@ -13,6 +13,7 @@ import com.david.hlp.Spring.common.result.PageInfo;
 import com.david.hlp.Spring.common.result.Result;
 import java.util.List;
 import com.david.hlp.Spring.repeater.module.dto.RouterProjectDTO;
+import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/routerUrl")
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class RouterUrlController {
      * @return 操作结果
      */
     @PostMapping("/add")
-    public Result<Void> addRouterUrl(@RequestBody RouterUrl routerUrl) {
+    public Result<Void> addRouterUrl(@RequestBody RouterProjectDTO routerUrl) {
         routerUrlService.addRouterUrl(routerUrl);
         return Result.success();
     }
@@ -47,7 +48,7 @@ public class RouterUrlController {
      * @return 操作结果
      */
     @PostMapping("/update")
-    public Result<Void> updateRouterUrl(@RequestBody RouterUrl routerUrl) {
+    public Result<Void> updateRouterUrl(@RequestBody RouterProjectDTO routerUrl) {
         routerUrlService.updateRouterUrl(routerUrl);
         return Result.success();
     }
@@ -70,5 +71,15 @@ public class RouterUrlController {
     @GetMapping("/list")
     public Result<List<RouterUrl>> listAllRouterUrl() {
         return Result.success(routerUrlService.listAllRouterUrl());
+    }
+
+    /**
+     * 启用路由信息
+     * @param routerUrl 路由信息
+     * @return 操作结果
+     */
+    @GetMapping("/listByProjectId")
+    public Result<List<RouterUrl>> listRouterUrlByProjectId(@RequestParam("id") Integer id) {
+        return Result.success(routerUrlService.listRouterUrlByProjectId(id));
     }
 }
