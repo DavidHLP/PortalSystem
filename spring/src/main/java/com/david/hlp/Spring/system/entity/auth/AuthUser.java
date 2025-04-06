@@ -6,16 +6,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.Builder;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
+import com.david.hlp.Spring.common.result.BaseUser;
+import lombok.experimental.SuperBuilder;
 /**
  * Spring Security 用的用户类，实现 UserDetails 接口。
  */
-@Builder
+@SuperBuilder
 @AllArgsConstructor
-public class AuthUser implements UserDetails {
+public class AuthUser extends BaseUser implements UserDetails {
 
     private final Long userId;               // 数据库中的用户主键ID
     private final String username;           // 登录名（在此示例中使用 email 或其他字段）

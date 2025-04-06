@@ -356,7 +356,6 @@ const addProject = () => {
     projectName: selectedProject.projectName,
     doc: selectedProject.doc || ''
   })
-  console.log('添加后的projects:', form.projects)
   // 清空选择
   selectedProjectId.value = ''
 }

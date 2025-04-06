@@ -501,7 +501,7 @@ const filterNode = (value: string, data: Router) => {
   if (!value) return true
   return data.name.includes(value) ||
          data.path.includes(value) ||
-         data.permission?.includes(value) ||
+         data.permissions?.includes(value) ||
          data.meta?.component?.includes(value)
 }
 
@@ -549,7 +549,6 @@ const dragInfo = ref<{
 
 // 拖拽结束处理
 const handleDragEnd = async (draggingNode: any, dropNode: any, dropType: string) => {
-  console.log('拖拽结束', draggingNode.data, dropNode?.data, dropType);
 
   // 如果没有目标节点，说明是无效的拖拽
   if (!dropNode) return;
@@ -793,7 +792,6 @@ const handleDelete = (row: Router) => {
 // 提交添加操作
 const submitAdd = async () => {
   try {
-    console.log('提交添加', formData.value)
 
     // 处理数据格式，确保与后端兼容
     const submittingData = { ...formData.value }

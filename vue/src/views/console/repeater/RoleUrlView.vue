@@ -273,7 +273,6 @@ const getRoleUrlList = async () => {
     const res = await listRoleUrl(pageInfo)
     roleUrlList.value = res.items || []
     pageInfo.total = res.total || 0
-    console.log(res)
   } catch (error) {
     console.error('获取角色URL列表失败', error)
     ElMessage.error('获取角色URL列表失败')

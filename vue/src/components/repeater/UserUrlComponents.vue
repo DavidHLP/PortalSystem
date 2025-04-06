@@ -173,7 +173,6 @@ const getRoleOptions = async () => {
       roleName: item.roleName,
       projectId: item.projectId
     }))
-    console.log('roleOptions', roleOptions.value)
   } catch (error) {
     ElMessage.error('获取角色列表失败')
   } finally {
@@ -310,7 +309,6 @@ const submitForm = async () => {
           await updateUserRoleProject(form)
           ElMessage.success('更新成功')
         } else if (dialogStatus.value === 'password') {
-          console.log('form', form)
           await updateUserPassword(form)
           ElMessage.success('密码修改成功')
         }

@@ -1,5 +1,7 @@
 package com.david.hlp.Spring.system.auth;
 
+import com.david.hlp.Spring.common.service.JwtCommonService;
+import com.david.hlp.Spring.system.entity.auth.AuthUser;
 import com.david.hlp.Spring.system.mapper.TokenMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,7 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   // 用于处理 JWT 的服务类
-  private final JwtService jwtService;
+  private final JwtCommonService<AuthUser> jwtService;
 
   // 用于加载用户详细信息
   @Qualifier("userDetailsServiceImp")
@@ -44,17 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     "/api/auth/demo/register",
     "/api/auth/demo/logout",
     "/api/auth/demo/refresh-token",
-    "/api/repeater/auth/login",
-    "/swagger-ui/**",
-    "/doc.html",
-    "/doc.html/**",
-    "/v3/api-docs",
-    "/v3/api-docs/**",
-    "/webjars/**",
-    "/authenticate",
-    "/swagger-ui.html/**",
-    "/swagger-resources",
-    "/swagger-resources/**"
+    "/api/cloud",
   };
 
 
@@ -81,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 1. 检查是否为公开路径
     String path = request.getServletPath();
-    boolean isPublicPath = Arrays.stream(publicPaths).anyMatch(path::equals);
+    boolean isPublicPath = Arrays.stream(publicPaths).anyMatch(path::startsWith);
 
     // 2. 检查Authorization头
     final String authHeader = request.getHeader("Authorization");
@@ -101,31 +93,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 5. 处理正常的带token请求
     final String jwt = authHeader.substring(7);
     final String userEmail = jwtService.extractUsername(jwt);
-
-    // if (path.startsWith("/api/repeater/auth/")) {
-    //   // 验证用户并设置认证信息
-    //   UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-    //   // 检查 JWT 是否在数据库中有效，且未过期或撤销
-    //   var isTokenValid = tokenMapper.checkTokenValid(jwt);
-    //   // 验证 JWT 是否有效
-    //   if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
-    //     // 直接从UserDetails获取权限
-    //     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-    //             userDetails,
-    //             null,
-    //             userDetails.getAuthorities()
-    //     );
-
-    //     // 设置认证请求的详细信息
-    //     authToken.setDetails(
-    //             new WebAuthenticationDetailsSource().buildDetails(request)
-    //     );
-
-    //     // 确保在认证成功后设置SecurityContext
-    //     SecurityContextHolder.getContext().setAuthentication(authToken);
-    //   }
-    // }
-
     // 验证用户并设置认证信息
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       // 从 UserDetailsService 加载用户信息
@@ -135,7 +102,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       var isTokenValid = tokenMapper.checkTokenValid(jwt);
 
       // 验证 JWT 是否有效
-      if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
+      if (jwtService.isTokenValid(jwt, (AuthUser)userDetails) && isTokenValid) {
         // 直接从UserDetails获取权限
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 userDetails,
@@ -157,9 +124,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     filterChain.doFilter(request, response);
   }
-
-  // @Override
-  // protected boolean shouldNotFilter(HttpServletRequest request) {
-  //   return request.getServletPath().startsWith("/api/auth/");
-  // }
 }

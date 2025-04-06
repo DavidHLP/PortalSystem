@@ -260,7 +260,6 @@ const getRouterUrlList = async () => {
       projects: []
     }
 
-    console.log('pageInfo: ', pageInfo.item)
 
     const res = await listRouterUrl(pageInfo)
     if (res.items) {
@@ -272,7 +271,6 @@ const getRouterUrlList = async () => {
         return item;
       }) as RouterProjectDTO[];
       pageInfo.total = res.total || 0
-      console.log('routerUrlList: ', routerUrlList.value)
     }
   } catch (error) {
     console.error('获取路由URL列表失败', error)

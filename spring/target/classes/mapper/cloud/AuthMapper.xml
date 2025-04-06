@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.david.hlp.Spring.cloud.mapper.AuthMapper">
+
+    <!-- login -->
+
+    <select id="login" resultType="com.david.hlp.Spring.cloud.module.entity.LoginRequest">
+        SELECT * FROM user_url WHERE email = #{email} AND is_deleted = 0
+    </select>
+
+</mapper>

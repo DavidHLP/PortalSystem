@@ -20,6 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.stream.Collectors;
 import java.util.Optional;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 
 /**
  * 全局异常处理器
@@ -33,6 +37,10 @@ public class GlobalExceptionHandler {
     private static final String PARAM_ERROR_MSG = "参数错误";
     private static final String DATE_FORMAT_ERROR_MSG = "日期时间格式错误，请使用正确的格式 (yyyy-MM-dd'T'HH:mm:ss)";
     private static final String DB_ERROR_MSG = "数据库操作异常，请联系管理员";
+    private static final String TOKEN_EXPIRED_MSG = "登录已过期，请重新登录";
+    private static final String TOKEN_INVALID_MSG = "无效的身份令牌";
+    private static final String TOKEN_SIGNATURE_MSG = "身份验证失败，令牌签名无效";
+    private static final String TOKEN_UNSUPPORTED_MSG = "不支持的令牌格式";
 
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -105,6 +113,46 @@ public class GlobalExceptionHandler {
     public Result<?> handleDataAccessException(final DataAccessException ex) {
         log.error("数据库操作异常", ex);
         return Result.error(ResultCode.INTERNAL_ERROR, DB_ERROR_MSG);
+    }
+
+    /**
+     * 处理JWT令牌过期异常
+     */
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result<?> handleExpiredJwtException(final ExpiredJwtException ex) {
+        log.warn("JWT令牌已过期: {}", ex.getMessage());
+        return Result.error(ResultCode.UNAUTHORIZED, TOKEN_EXPIRED_MSG);
+    }
+
+    /**
+     * 处理JWT签名无效异常
+     */
+    @ExceptionHandler(SignatureException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result<?> handleSignatureException(final SignatureException ex) {
+        log.warn("JWT签名验证失败: {}", ex.getMessage());
+        return Result.error(ResultCode.UNAUTHORIZED, TOKEN_SIGNATURE_MSG);
+    }
+
+    /**
+     * 处理JWT格式错误异常
+     */
+    @ExceptionHandler(MalformedJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result<?> handleMalformedJwtException(final MalformedJwtException ex) {
+        log.warn("JWT格式错误: {}", ex.getMessage());
+        return Result.error(ResultCode.UNAUTHORIZED, TOKEN_INVALID_MSG);
+    }
+
+    /**
+     * 处理不支持的JWT异常
+     */
+    @ExceptionHandler(UnsupportedJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result<?> handleUnsupportedJwtException(final UnsupportedJwtException ex) {
+        log.warn("不支持的JWT令牌: {}", ex.getMessage());
+        return Result.error(ResultCode.UNAUTHORIZED, TOKEN_UNSUPPORTED_MSG);
     }
 
     @ExceptionHandler(Exception.class)

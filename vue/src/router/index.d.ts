@@ -43,5 +43,5 @@ export interface Router {
   pid: null;
   remark: string;
   status: number;
-  [property: string];
+  [property: string]: any;
 }

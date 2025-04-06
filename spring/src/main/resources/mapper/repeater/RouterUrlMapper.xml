@@ -41,18 +41,16 @@
 
     <!-- 统计路由数量 -->
     <select id="countRouterUrl" parameterType="com.david.hlp.Spring.repeater.module.entity.RouterUrl" resultType="java.lang.Long">
-        SELECT COUNT(DISTINCT ru.id) FROM router_url ru
-        LEFT JOIN router_project_url rpu ON ru.id = rpu.router_id
-        LEFT JOIN project p ON p.id = rpu.project_id
+        SELECT COUNT(*) FROM router_url
         <where>
-            ru.is_deleted = 0
-            <if test="host != null and host != ''">AND ru.host LIKE CONCAT('%', #{host}, '%')</if>
-            <if test="port != null">AND ru.port = #{port}</if>
-            <if test="router != null and router != ''">AND ru.router LIKE CONCAT('%', #{router}, '%')</if>
-            <if test="protocol != null and protocol != ''">AND ru.protocol = #{protocol}</if>
-            <if test="uniqueId != null and uniqueId != ''">AND ru.unique_id = #{uniqueId}</if>
-            <if test="type != null">AND ru.type = #{type}</if>
-            <if test="httpMethod != null">AND ru.http_method = #{httpMethod}</if>
+            is_deleted = 0
+            <if test="host != null and host != ''">AND host LIKE CONCAT('%', #{host}, '%')</if>
+            <if test="port != null">AND port = #{port}</if>
+            <if test="router != null and router != ''">AND router LIKE CONCAT('%', #{router}, '%')</if>
+            <if test="protocol != null and protocol != ''">AND protocol = #{protocol}</if>
+            <if test="uniqueId != null and uniqueId != ''">AND unique_id = #{uniqueId}</if>
+            <if test="type != null">AND type = #{type}</if>
+            <if test="httpMethod != null">AND http_method = #{httpMethod}</if>
         </where>
     </select>
 
@@ -88,21 +86,24 @@
             p.id as "projects.id", p.project_name as "projects.project_name",
             p.doc as "projects.doc", p.gmt_create as "projects.gmt_create",
             p.gmt_modified as "projects.gmt_modified", p.is_deleted as "projects.is_deleted"
-        FROM router_url ru
+        FROM (
+            SELECT *
+            FROM router_url
+            <where>
+                is_deleted = 0
+                <if test="routerUrl.host != null and routerUrl.host != ''">AND host LIKE CONCAT('%', #{routerUrl.host}, '%')</if>
+                <if test="routerUrl.port != null">AND port = #{routerUrl.port}</if>
+                <if test="routerUrl.router != null and routerUrl.router != ''">AND router LIKE CONCAT('%', #{routerUrl.router}, '%')</if>
+                <if test="routerUrl.protocol != null and routerUrl.protocol != ''">AND protocol = #{routerUrl.protocol}</if>
+                <if test="routerUrl.uniqueId != null and routerUrl.uniqueId != ''">AND unique_id = #{routerUrl.uniqueId}</if>
+                <if test="routerUrl.type != null">AND type = #{routerUrl.type}</if>
+                <if test="routerUrl.httpMethod != null">AND http_method = #{routerUrl.httpMethod}</if>
+            </where>
+            ORDER BY id DESC
+            LIMIT #{pageSize} OFFSET #{offset}
+        ) ru
         LEFT JOIN router_project_url rpu ON ru.id = rpu.router_id
         LEFT JOIN project p ON p.id = rpu.project_id
-        <where>
-            ru.is_deleted = 0
-            <if test="routerUrl.host != null and routerUrl.host != ''">AND ru.host LIKE CONCAT('%', #{routerUrl.host}, '%')</if>
-            <if test="routerUrl.port != null">AND ru.port = #{routerUrl.port}</if>
-            <if test="routerUrl.router != null and routerUrl.router != ''">AND ru.router LIKE CONCAT('%', #{routerUrl.router}, '%')</if>
-            <if test="routerUrl.protocol != null and routerUrl.protocol != ''">AND ru.protocol = #{routerUrl.protocol}</if>
-            <if test="routerUrl.uniqueId != null and routerUrl.uniqueId != ''">AND ru.unique_id = #{routerUrl.uniqueId}</if>
-            <if test="routerUrl.type != null">AND ru.type = #{routerUrl.type}</if>
-            <if test="routerUrl.httpMethod != null">AND ru.http_method = #{routerUrl.httpMethod}</if>
-        </where>
-        ORDER BY ru.id DESC
-        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <!-- 查询所有路由信息 -->
@@ -165,7 +166,7 @@
         SELECT * FROM router_role_url WHERE role_id = #{roleId}
     </select>
 
-    <!-- listRouterUrlByProjectId --> 
+    <!-- listRouterUrlByProjectId -->
 
     <select id="listRouterUrlByProjectId" resultType="com.david.hlp.Spring.repeater.module.entity.RouterUrl">
         SELECT * FROM router_url WHERE id IN (

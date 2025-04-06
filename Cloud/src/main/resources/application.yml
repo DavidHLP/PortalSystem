@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: SpringCloud
+
+server:
+  error:
+    whitelabel:
+      enabled: false # 禁用 Spring 默认错误页面
+  port: 8084
+
+logging:
+  level:
+    org.springframework.boot.autoconfigure: OFF # 禁用自动配置日志
+    # org.springframework: DEBUG # Spring 调试日志级别

@@ -1,4 +1,4 @@
-package com.david.hlp.Spring.system.token;
+package com.david.hlp.Spring.common.enums;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.IEnum;
 

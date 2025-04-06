@@ -1,8 +1,17 @@
+
+application:
+  security:
+    jwt:
+      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      expiration: 86400000 # JWT 过期时间，1 天（毫秒）
+      refresh-token:
+        expiration: 604800000 # 刷新令牌过期时间，7 天（毫秒）
+
 spring:
   cloud:
     loadbalancer:
-      ribbon:
-        enabled: false
+      retry:
+        enabled: true
   servlet:
     multipart:
       max-file-size: 10MB
@@ -36,14 +45,6 @@ spring:
           max-wait: -1    # 最大阻塞等待时间(负数表示无限制)
           max-idle: 5     # 最大空闲连接数
           min-idle: 0     # 最小空闲连接数
-application:
-  security:
-    jwt:
-      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      expiration: 86400000 # JWT 过期时间，1 天（毫秒）
-      refresh-token:
-        expiration: 604800000 # 刷新令牌过期时间，7 天（毫秒）
-
 server:
   error:
     whitelabel:
@@ -53,10 +54,8 @@ server:
 logging:
   level:
     org.springframework.boot.autoconfigure: OFF # 禁用自动配置日志
-    # org.springframework: DEBUG # Spring 调试日志级别
-    # com.david.hlp.Spring.auth.mapper: DEBUG
-    # org.mybatis: DEBUG
-    # com.david.hlp.Spring.system.mapper: TRACE
+    org.springframework: DEBUG # Spring 调试日志级别
+    org.mybatis: DEBUG
 
 # MyBatis-Plus 配置
 mybatis-plus:

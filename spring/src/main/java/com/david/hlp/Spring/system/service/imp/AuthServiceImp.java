@@ -5,7 +5,7 @@ import com.david.hlp.Spring.system.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.david.hlp.Spring.common.enums.ResultCode;
-import com.david.hlp.Spring.system.auth.JwtService;
+import com.david.hlp.Spring.common.enums.TokenType;
 import com.david.hlp.Spring.system.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
 import com.david.hlp.Spring.system.entity.user.User;
@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.david.hlp.Spring.system.token.Token;
 import com.david.hlp.Spring.system.entity.auth.LoginDTO;
 import com.david.hlp.Spring.common.exception.BusinessException;
+import com.david.hlp.Spring.common.service.JwtCommonService;
 import com.david.hlp.Spring.system.entity.auth.AuthUser;
-import com.david.hlp.Spring.system.token.TokenType;
 import com.david.hlp.Spring.system.mapper.TokenMapper;
 import com.david.hlp.Spring.system.service.AuthService;
 /**
@@ -29,7 +29,7 @@ public class AuthServiceImp implements AuthService<LoginDTO, RegistrationDTO , T
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final JwtCommonService<AuthUser> jwtService;
     private final RoleMapper roleMapper;
     private final TokenMapper tokenMapper;
 
