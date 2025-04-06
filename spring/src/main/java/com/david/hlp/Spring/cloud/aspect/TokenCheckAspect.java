@@ -4,6 +4,7 @@ import com.david.hlp.Spring.common.service.JwtCommonService;
 import com.david.hlp.Spring.cloud.module.entity.LoginRequest;
 import com.david.hlp.Spring.common.enums.ResultCode;
 import com.david.hlp.Spring.common.result.Result;
+import com.david.hlp.Spring.common.util.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -67,8 +68,15 @@ public class TokenCheckAspect {
                     log.warn("无效的token: {}", jwt);
                     return Result.error(ResultCode.UNAUTHORIZED, "无效或已过期的认证令牌");
                 }
-            // 如果token有效，继续执行原始方法
-            return joinPoint.proceed();
+                // 将用户邮箱存入上下文
+                UserContext.setCurrentEmail(userEmail);
+                try {
+                    // 如果token有效，继续执行原始方法
+                    return joinPoint.proceed();
+                } finally {
+                    // 请求结束后清除上下文，防止内存泄漏
+                    UserContext.clear();
+                }
         }
     }
 }

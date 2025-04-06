@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements Serializable {
-    private String username;
-    private PasswordDTO data;
-    private String email;
+public class PasswordDTO implements Serializable {
+    private String password;
 }

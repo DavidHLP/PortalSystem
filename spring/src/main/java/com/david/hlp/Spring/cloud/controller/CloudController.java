@@ -9,16 +9,16 @@ import com.david.hlp.Spring.cloud.module.entity.CloudToken;
 import com.david.hlp.Spring.cloud.service.impl.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import com.david.hlp.Spring.cloud.module.dto.CloudDTO;
 import java.util.HashMap;
 import com.david.hlp.Spring.cloud.module.dto.CloudData;
 import com.david.hlp.Spring.common.result.Result;
 import com.david.hlp.Spring.cloud.service.impl.CloudServiceImpl;
+import com.david.hlp.Spring.cloud.module.dto.CloudRequest;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/cloud")
-public class CloudController {
+public class CloudController extends CloudBaseController {
     private final AuthServiceImpl authService;
     private final CloudServiceImpl cloudService;
 
@@ -31,14 +31,9 @@ public class CloudController {
     public void logout(@RequestBody CloudToken cloudToken) {
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "test";
-    }
-
     @PostMapping("/post")
-    public Result<HashMap<String, Object>> post(@RequestBody CloudDTO<CloudData<HashMap<String, Object>>> cloudDTO) {
-        HashMap<String, Object> result = cloudService.post(cloudDTO);
+    public Result<HashMap<String, Object>> post(@RequestBody CloudRequest cloudRequest) {
+        HashMap<String, Object> result = cloudService.post(cloudRequest, getCurrentUserEmail());
         return Result.success(result);
     }
 }

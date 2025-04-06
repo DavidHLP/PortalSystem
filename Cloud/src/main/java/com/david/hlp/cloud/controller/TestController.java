@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class TestController {
     @PostMapping("/test")
     public User postMethodName(@RequestBody User entity) {
-        entity.getData().setPassword(entity.getData().getPassword()*7);
+        System.out.println("entity: " + entity);
         return entity;
     }
 }

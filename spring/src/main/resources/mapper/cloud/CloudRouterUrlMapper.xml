@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.david.hlp.Spring.cloud.mapper.CloudRouterUrlMapper">
+
+    <resultMap id="CloudDTO" type="com.david.hlp.Spring.cloud.module.dto.CloudDTO">
+        <result property="host" column="host"/>
+        <result property="protocol" column="protocol"/>
+        <result property="uniqueId" column="unique_id"/>
+        <result property="type" column="type"/>
+        <result property="port" column="port"/>
+        <result property="httpMethod" column="http_method"/>
+        <result property="router" column="router"/>
+        <association property="data" javaType="com.david.hlp.Spring.cloud.module.dto.CloudData">
+            <result property="email" column="email"/>
+            <result property="username" column="username"/>
+        </association>
+    </resultMap>
+
+    <!-- 查询所有路由 -->
+    <select id="selectByUniqueIdAndUserId" resultMap="CloudDTO">
+        SELECT
+            router_url.`host` AS `host`,
+            router_url.protocol AS protocol,
+            router_url.unique_id AS unique_id,
+            router_url.type AS type,
+            router_url.`port` AS `port`,
+            router_url.http_method AS http_method,
+            router_url.router AS router,
+            user_url.email AS `email`,
+            user_url.username AS `username`
+        FROM
+            user_url
+        LEFT JOIN
+            user_role_url ON user_role_url.user_id = user_url.id
+        LEFT JOIN
+            router_role_url ON router_role_url.role_id = user_role_url.role_id
+        LEFT JOIN
+            router_url ON router_role_url.router_id = router_url.id
+        WHERE
+            user_url.is_deleted = 0
+            AND user_role_url.is_deleted = 0
+            AND router_role_url.is_deleted = 0
+            AND router_url.is_deleted = 0
+            AND user_url.email = #{userId}
+            AND router_url.unique_id = #{uniqueId}
+    </select>
+
+</mapper>
