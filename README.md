@@ -95,3 +95,38 @@ graph TD
 
 系统采用前后端分离架构，后端基于Spring Cloud微服务设计，具有良好的扩展性和模块化特性。
 
+
+## 项目示例图
+
+### 控制面板
+![控制面板](./image/controlPanel.png)
+
+### 用户管理
+
+![用户管理](./image/user.png)
+
+### 角色管理
+
+![角色管理](./image/role.png)
+
+### 菜单管理
+
+![权限管理](./image/router.png)
+
+
+### 项目管理
+
+![项目管理](./image/project.png)
+
+
+### 权限管理
+
+![权限管理](./image/roleurl.png)
+
+### Url管理
+
+![Url管理](./image/url.png)
+
+### 用户管理
+
+![用户管理](./image/userurl.png)
